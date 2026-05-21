@@ -1804,20 +1804,22 @@
                                     </div>
                                     
                                     <!-- 实时数据 -->
-                                    <div style="display:flex;justify-content:center;gap:24px;margin-bottom:24px;">
-                                        <div style="text-align:center;">
-                                            <div style="font-size:28px;" id="workoutLiveCal">0</div>
-                                            <div style="font-size:11px;color:#94A3B8;">千卡</div>
+                                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;">
+                                        <div style="background:rgba(255,255,255,0.08);padding:12px 8px;border-radius:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;color:white;" id="workoutLiveSteps">0</div>
+                                            <div style="font-size:10px;color:#94A3B8;">👟 步数</div>
                                         </div>
-                                        <div style="width:1px;background:rgba(255,255,255,0.15);"></div>
-                                        <div style="text-align:center;">
-                                            <div style="font-size:28px;" id="workoutLiveHeart">--</div>
-                                            <div style="font-size:11px;color:#94A3B8;">心率</div>
+                                        <div style="background:rgba(255,255,255,0.08);padding:12px 8px;border-radius:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;color:#F97316;" id="workoutLiveCal">0</div>
+                                            <div style="font-size:10px;color:#94A3B8;">🔥 千卡</div>
                                         </div>
-                                        <div style="width:1px;background:rgba(255,255,255,0.15);"></div>
-                                        <div style="text-align:center;">
-                                            <div style="font-size:28px;" id="workoutLiveDist">0.0</div>
-                                            <div style="font-size:11px;color:#94A3B8;">公里</div>
+                                        <div style="background:rgba(255,255,255,0.08);padding:12px 8px;border-radius:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;color:#EF4444;" id="workoutLiveHeart">--</div>
+                                            <div style="font-size:10px;color:#94A3B8;">❤️ 心率</div>
+                                        </div>
+                                        <div style="background:rgba(255,255,255,0.08);padding:12px 8px;border-radius:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;color:#10B981;" id="workoutLiveDist">0.0</div>
+                                            <div style="font-size:10px;color:#94A3B8;">📍 公里</div>
                                         </div>
                                     </div>
                                     
@@ -2547,6 +2549,24 @@
         
         // ========== 页面切换 ==========
         function switchPage(page) {
+            // 离开运动详情页时，自动结束本次运动计时
+            if (page !== 'SportDetail' && workoutTimer !== null) {
+                if (workoutSeconds >= 30) {
+                    // 运动超过30秒自动保存
+                    if (confirm(`正在${selectedSportName}中，离开将自动结束运动。确定离开吗？`)) {
+                        stopWorkoutAndSave();
+                    } else {
+                        return; // 取消离开
+                    }
+                } else {
+                    // 不足30秒直接停止不保存
+                    clearInterval(workoutTimer);
+                    workoutTimer = null;
+                    document.getElementById('sportWorkoutActive').style.display = 'none';
+                    document.getElementById('sportActionButtons').style.display = 'flex';
+                }
+            }
+            
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page' + page).classList.add('active');
             
@@ -2554,6 +2574,39 @@
             event.currentTarget?.classList.add('active');
             
             updateAllDisplays();
+        }
+        
+        // 停止运动并保存（静默，不弹确认）
+        function stopWorkoutAndSave() {
+            clearInterval(workoutTimer);
+            workoutTimer = null;
+            
+            const minutes = Math.ceil(workoutSeconds / 60);
+            const record = {
+                sport: selectedSportName,
+                icon: selectedSportIcon,
+                steps: workoutLiveSteps,
+                calories: workoutLiveCal,
+                time: minutes,
+                heartRate: workoutLiveHeart,
+                distance: parseFloat(workoutLiveDist.toFixed(1)),
+                note: '计时运动(自动结束)',
+                date: new Date().toISOString()
+            };
+            
+            if (!userData.workoutHistory) userData.workoutHistory = [];
+            userData.todayFitness.steps += workoutLiveSteps;
+            userData.todayFitness.calories += workoutLiveCal;
+            userData.todayFitness.exerciseTime += minutes;
+            userData.todayFitness.distance += parseFloat(workoutLiveDist.toFixed(1));
+            if (workoutLiveHeart > 0) userData.todayFitness.heartRate = workoutLiveHeart;
+            userData.workoutHistory.push(record);
+            saveUserData();
+            
+            document.getElementById('sportWorkoutActive').style.display = 'none';
+            document.getElementById('sportActionButtons').style.display = 'flex';
+            
+            Toast(`✅ ${selectedSportName}已自动结束并保存`);
         }
         
         function switchMode(mode) {
@@ -3522,6 +3575,22 @@
         let workoutLiveCal = 0;         // 实时热量
         let workoutLiveDist = 0;        // 实时距离
         let workoutLiveHeart = 0;       // 实时心率（模拟）
+        let workoutLiveSteps = 0;       // 实时步数
+        
+        // 各运动的每分钟步数估算
+        const SPORT_STEPS_PER_MIN = {
+            '跑步': 160, '快走': 120, '骑行': 0, '跳绳': 200, 'HIIT': 130, '有氧操': 100,
+            '游泳': 0, '登山': 100, '瑜伽': 10, '普拉提': 15, '力量训练': 30, '划船': 60,
+            '拳击': 100, '跆拳道': 90, '摔跤': 80, '太极': 40, '拉伸': 5, '椭圆机': 120,
+            '爬楼梯': 150, '动感单车': 60, 'CrossFit': 100, '搏击操': 110, '街舞': 100,
+            '芭蕾': 50, '体操': 60, '滑雪': 0, '滑冰': 80, '轮滑': 80, '冲浪': 0,
+            '皮划艇': 0, '帆船': 0, '攀岩': 40, '蹦床': 100, '飞盘': 120, '武术': 70,
+            '射箭': 0, '高尔夫': 60, '壁球': 120, '保龄球': 30, '板球': 80, '橄榄球': 100,
+            '曲棍球': 90, '马术': 0, '击剑': 70, '举重': 20, '仰卧起坐': 15, '俯卧撑': 10,
+            '引体向上': 8, '深蹲': 20, '硬拉': 15, '卧推': 10, '划船机': 60, '战绳': 80,
+            '壶铃': 40, 'TRX': 50, '自重训练': 40, '健美操': 80, '尊巴': 90, '爵士舞': 70,
+            '现代舞': 60, '踢踏舞': 100, '广场舞': 80
+        };
         
         // 各运动的每分钟热量消耗估算（千卡/分钟）
         const SPORT_CAL_PER_MIN = {
@@ -3540,6 +3609,9 @@
         
         // 开始运动
         function startSportWorkout() {
+            // 先清理之前的计时器
+            if (workoutTimer) { clearInterval(workoutTimer); workoutTimer = null; }
+            
             const sportDiv = document.getElementById('sportWorkoutActive');
             const actionDiv = document.getElementById('sportActionButtons');
             
@@ -3549,6 +3621,7 @@
             workoutLiveCal = 0;
             workoutLiveDist = 0;
             workoutLiveHeart = 0;
+            workoutLiveSteps = 0;
             workoutStartTime = Date.now();
             
             // 显示运动界面
@@ -3575,12 +3648,17 @@
             if (workoutPaused) return;
             workoutSeconds++;
             
+            // 计算步数
+            const stepsPerSec = (SPORT_STEPS_PER_MIN[selectedSportName] || 80) / 60;
+            workoutLiveSteps = Math.round(workoutSeconds * stepsPerSec);
+            
             // 计算热量
             const calPerSec = (SPORT_CAL_PER_MIN[selectedSportName] || 7) / 60;
             workoutLiveCal = Math.round(workoutSeconds * calPerSec);
             
-            // 模拟距离（假设跑步/步行约5分钟1公里，其他运动随机）
-            workoutLiveDist = Math.round((workoutSeconds / 300) * 10) / 10;
+            // 模拟距离
+            const distPerSec = 0.005 + (Math.random() * 0.003);
+            workoutLiveDist = Math.round((workoutLiveDist + distPerSec) * 10) / 10;
             
             // 模拟心率（120-160之间波动）
             workoutLiveHeart = 120 + Math.floor(Math.random() * 40);
@@ -3595,6 +3673,7 @@
             const s = workoutSeconds % 60;
             const timeStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
             document.getElementById('workoutTimer').textContent = timeStr;
+            document.getElementById('workoutLiveSteps').textContent = workoutLiveSteps.toLocaleString();
             document.getElementById('workoutLiveCal').textContent = workoutLiveCal;
             document.getElementById('workoutLiveDist').textContent = workoutLiveDist.toFixed(1);
             document.getElementById('workoutLiveHeart').textContent = workoutLiveHeart || '--';
@@ -3629,7 +3708,7 @@
             if (workoutSeconds < 10) {
                 if (!confirm('运动时间不到10秒，确定要结束吗？')) return;
             } else {
-                if (!confirm(`运动了 ${formatWorkoutTime(workoutSeconds)}，消耗 ${workoutLiveCal} 千卡。确定结束吗？`)) return;
+                if (!confirm(`运动了 ${formatWorkoutTime(workoutSeconds)}，${workoutLiveSteps} 步，消耗 ${workoutLiveCal} 千卡。确定结束吗？`)) return;
             }
             
             // 停止计时器
@@ -3641,7 +3720,7 @@
             const record = {
                 sport: selectedSportName,
                 icon: selectedSportIcon,
-                steps: 0,
+                steps: workoutLiveSteps,
                 calories: workoutLiveCal,
                 time: minutes,
                 heartRate: workoutLiveHeart,
@@ -3652,6 +3731,7 @@
             
             // 更新今日数据
             if (!userData.workoutHistory) userData.workoutHistory = [];
+            userData.todayFitness.steps += workoutLiveSteps;
             userData.todayFitness.calories += workoutLiveCal;
             userData.todayFitness.exerciseTime += minutes;
             userData.todayFitness.distance += parseFloat(workoutLiveDist.toFixed(1));
@@ -3667,7 +3747,7 @@
             // 刷新详情页
             renderSportDetailPage();
             
-            Toast(`✅ ${selectedSportName}完成！${formatWorkoutTime(workoutSeconds)} · ${workoutLiveCal}千卡`);
+            Toast(`✅ ${selectedSportName}完成！${workoutLiveSteps}步 · ${formatWorkoutTime(workoutSeconds)} · ${workoutLiveCal}千卡`);
             
             // 在详情页内生成完成总结
             showWorkoutSummary(record);
@@ -3694,18 +3774,22 @@
                         <div style="font-size:40px;margin-bottom:8px;">🎉</div>
                         <div style="font-size:18px;font-weight:700;color:#1E293B;">${selectedSportName}完成！</div>
                     </div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
-                        <div style="background:white;padding:12px;border-radius:12px;">
-                            <div style="font-size:24px;font-weight:700;color:#6366F1;">${formatWorkoutTime(workoutSeconds)}</div>
-                            <div style="font-size:11px;color:#94A3B8;">运动时长</div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;">
+                        <div style="background:white;padding:10px;border-radius:12px;">
+                            <div style="font-size:20px;font-weight:700;color:#6366F1;">${formatWorkoutTime(workoutSeconds)}</div>
+                            <div style="font-size:10px;color:#94A3B8;">时长</div>
                         </div>
-                        <div style="background:white;padding:12px;border-radius:12px;">
-                            <div style="font-size:24px;font-weight:700;color:#F59E0B;">${record.calories}</div>
-                            <div style="font-size:11px;color:#94A3B8;">千卡</div>
+                        <div style="background:white;padding:10px;border-radius:12px;">
+                            <div style="font-size:20px;font-weight:700;color:#8B5CF6;">${record.steps.toLocaleString()}</div>
+                            <div style="font-size:10px;color:#94A3B8;">步数</div>
                         </div>
-                        <div style="background:white;padding:12px;border-radius:12px;">
-                            <div style="font-size:24px;font-weight:700;color:#10B981;">${record.distance}</div>
-                            <div style="font-size:11px;color:#94A3B8;">公里</div>
+                        <div style="background:white;padding:10px;border-radius:12px;">
+                            <div style="font-size:20px;font-weight:700;color:#F59E0B;">${record.calories}</div>
+                            <div style="font-size:10px;color:#94A3B8;">千卡</div>
+                        </div>
+                        <div style="background:white;padding:10px;border-radius:12px;">
+                            <div style="font-size:20px;font-weight:700;color:#10B981;">${record.distance}</div>
+                            <div style="font-size:10px;color:#94A3B8;">公里</div>
                         </div>
                     </div>
                 </div>
