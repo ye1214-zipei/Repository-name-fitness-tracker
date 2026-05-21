@@ -1771,10 +1771,68 @@
                             </div>
                         </div>
                         
-                        <!-- 快捷记录按钮 -->
-                        <button onclick="showSportRecordModal(selectedSportName, selectedSportIcon)" style="width:100%;padding:16px;background:white;color:#6366F1;border:2px solid #6366F1;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(99,102,241,0.2);">
-                            <i class="fas fa-plus-circle"></i> 记录本次运动
-                        </button>
+                        <!-- 开始运动 + 记录按钮 -->
+                        <div id="sportActionButtons" style="display:flex;gap:12px;margin-bottom:20px;">
+                            <button onclick="startSportWorkout()" style="flex:1;padding:18px 16px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none;border-radius:16px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(99,102,241,0.35);transition:all 0.2s;">
+                                <i class="fas fa-play-circle" style="font-size:22px;"></i> 开始运动
+                            </button>
+                            <button onclick="showQuickRecordModal()" style="padding:18px 20px;background:white;color:#6366F1;border:2px solid #6366F1;border-radius:16px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;">
+                                <i class="fas fa-pen"></i> 记录
+                            </button>
+                        </div>
+                        
+                        <!-- 运动进行中界面 -->
+                        <div id="sportWorkoutActive" style="display:none;">
+                            <div style="background:linear-gradient(145deg,#1E293B,#0F172A);border-radius:20px;padding:24px 20px;margin-bottom:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);position:relative;overflow:hidden;">
+                                <!-- 光圈动画 -->
+                                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:180px;border:3px solid rgba(99,102,241,0.3);border-radius:50%;animation:pulse-ring 2s infinite;"></div>
+                                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;border:2px solid rgba(139,92,246,0.2);border-radius:50%;animation:pulse-ring 2s infinite 0.5s;"></div>
+                                <style>
+                                    @keyframes pulse-ring { 0% { transform:translate(-50%,-50%) scale(1); opacity:1; } 100% { transform:translate(-50%,-50%) scale(1.5); opacity:0; } }
+                                    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+                                </style>
+                                
+                                <div style="position:relative;z-index:1;">
+                                    <div style="font-size:48px;margin-bottom:8px;" id="workoutActiveIcon">🏃</div>
+                                    <div style="font-size:16px;color:#94A3B8;margin-bottom:16px;" id="workoutActiveName">正在运动...</div>
+                                    
+                                    <!-- 计时器 -->
+                                    <div id="workoutTimer" style="font-size:56px;font-weight:800;color:white;font-family:'Courier New',monospace;letter-spacing:4px;margin-bottom:8px;">00:00:00</div>
+                                    <div class="workout-status" style="display:inline-block;background:rgba(239,68,68,0.2);color:#EF4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:16px;">
+                                        <span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;margin-right:6px;animation:blink 1s infinite;"></span>
+                                        运动进行中
+                                    </div>
+                                    
+                                    <!-- 实时数据 -->
+                                    <div style="display:flex;justify-content:center;gap:24px;margin-bottom:24px;">
+                                        <div style="text-align:center;">
+                                            <div style="font-size:28px;" id="workoutLiveCal">0</div>
+                                            <div style="font-size:11px;color:#94A3B8;">千卡</div>
+                                        </div>
+                                        <div style="width:1px;background:rgba(255,255,255,0.15);"></div>
+                                        <div style="text-align:center;">
+                                            <div style="font-size:28px;" id="workoutLiveHeart">--</div>
+                                            <div style="font-size:11px;color:#94A3B8;">心率</div>
+                                        </div>
+                                        <div style="width:1px;background:rgba(255,255,255,0.15);"></div>
+                                        <div style="text-align:center;">
+                                            <div style="font-size:28px;" id="workoutLiveDist">0.0</div>
+                                            <div style="font-size:11px;color:#94A3B8;">公里</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 控制按钮 -->
+                                    <div style="display:flex;gap:16px;justify-content:center;">
+                                        <button id="btnPauseWorkout" onclick="pauseWorkout()" style="width:56px;height:56px;background:rgba(255,255,255,0.15);border:none;border-radius:50%;font-size:22px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                                            <i class="fas fa-pause" id="pauseIcon"></i>
+                                        </button>
+                                        <button onclick="endWorkout()" style="width:56px;height:56px;background:rgba(239,68,68,0.8);border:none;border-radius:50%;font-size:22px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- 本周趋势 -->
                         <div class="card" style="margin-bottom:16px;">
@@ -1782,7 +1840,6 @@
                                 <i class="fas fa-chart-line" style="color:#6366F1;"></i> 本周趋势
                             </div>
                             <div id="sportWeeklyChart" style="display:flex;align-items:flex-end;justify-content:space-between;height:120px;padding:10px 0;">
-                                <!-- 图表将由JS动态生成 -->
                             </div>
                             <div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;padding:0 10px;">
                                 <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
@@ -1842,7 +1899,7 @@
                                 <div style="text-align:center;padding:40px;color:#94A3B8;background:white;border-radius:16px;">
                                     <div style="font-size:48px;margin-bottom:12px;">📝</div>
                                     <p>暂无记录</p>
-                                    <p style="font-size:12px;margin-top:4px;">点击上方"记录本次运动"开始吧</p>
+                                    <p style="font-size:12px;margin-top:4px;">点击"开始运动"或"记录"按钮开始吧</p>
                                 </div>
                             </div>
                         </div>
@@ -3457,6 +3514,219 @@
         let selectedSportName = '';
         let selectedSportIcon = '';
         
+        // ==================== 运动计时器系统 ====================
+        let workoutTimer = null;        // 定时器ID
+        let workoutSeconds = 0;         // 已运动秒数
+        let workoutPaused = false;      // 是否暂停
+        let workoutStartTime = null;    // 开始时间
+        let workoutLiveCal = 0;         // 实时热量
+        let workoutLiveDist = 0;        // 实时距离
+        let workoutLiveHeart = 0;       // 实时心率（模拟）
+        
+        // 各运动的每分钟热量消耗估算（千卡/分钟）
+        const SPORT_CAL_PER_MIN = {
+            '跑步': 10, '快走': 5, '骑行': 8, '跳绳': 11, 'HIIT': 12, '有氧操': 7,
+            '游泳': 9, '登山': 8, '瑜伽': 4, '普拉提': 4, '力量训练': 7, '划船': 9,
+            '拳击': 10, '跆拳道': 9, '摔跤': 10, '太极': 3, '拉伸': 2, '椭圆机': 7,
+            '爬楼梯': 11, '动感单车': 9, 'CrossFit': 12, '搏击操': 10, '街舞': 8,
+            '芭蕾': 6, '体操': 7, '滑雪': 8, '滑冰': 7, '轮滑': 7, '冲浪': 9,
+            '皮划艇': 8, '帆船': 5, '攀岩': 10, '蹦床': 8, '飞盘': 7, '武术': 8,
+            '射箭': 3, '高尔夫': 4, '壁球': 8, '保龄球': 3, '板球': 6, '橄榄球': 10,
+            '曲棍球': 9, '马术': 5, '击剑': 8, '举重': 7, '仰卧起坐': 5, '俯卧撑': 6,
+            '引体向上': 7, '深蹲': 7, '硬拉': 7, '卧推': 6, '划船机': 8, '战绳': 12,
+            '壶铃': 8, 'TRX': 7, '自重训练': 6, '健美操': 7, '尊巴': 8, '爵士舞': 7,
+            '现代舞': 6, '踢踏舞': 7, '广场舞': 5
+        };
+        
+        // 开始运动
+        function startSportWorkout() {
+            const sportDiv = document.getElementById('sportWorkoutActive');
+            const actionDiv = document.getElementById('sportActionButtons');
+            
+            // 重置状态
+            workoutSeconds = 0;
+            workoutPaused = false;
+            workoutLiveCal = 0;
+            workoutLiveDist = 0;
+            workoutLiveHeart = 0;
+            workoutStartTime = Date.now();
+            
+            // 显示运动界面
+            actionDiv.style.display = 'none';
+            sportDiv.style.display = 'block';
+            
+            document.getElementById('workoutActiveIcon').textContent = selectedSportIcon;
+            document.getElementById('workoutActiveName').textContent = '正在' + selectedSportName + '...';
+            document.getElementById('btnPauseWorkout').style.background = 'rgba(255,255,255,0.15)';
+            document.getElementById('pauseIcon').className = 'fas fa-pause';
+            
+            updateWorkoutDisplay();
+            Toast('🏃 开始' + selectedSportName + '！加油！');
+            
+            // 启动计时器
+            workoutTimer = setInterval(workoutTick, 1000);
+            
+            // 滚动到运动界面
+            sportDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // 每秒触发
+        function workoutTick() {
+            if (workoutPaused) return;
+            workoutSeconds++;
+            
+            // 计算热量
+            const calPerSec = (SPORT_CAL_PER_MIN[selectedSportName] || 7) / 60;
+            workoutLiveCal = Math.round(workoutSeconds * calPerSec);
+            
+            // 模拟距离（假设跑步/步行约5分钟1公里，其他运动随机）
+            workoutLiveDist = Math.round((workoutSeconds / 300) * 10) / 10;
+            
+            // 模拟心率（120-160之间波动）
+            workoutLiveHeart = 120 + Math.floor(Math.random() * 40);
+            
+            updateWorkoutDisplay();
+        }
+        
+        // 更新运动界面显示
+        function updateWorkoutDisplay() {
+            const h = Math.floor(workoutSeconds / 3600);
+            const m = Math.floor((workoutSeconds % 3600) / 60);
+            const s = workoutSeconds % 60;
+            const timeStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            document.getElementById('workoutTimer').textContent = timeStr;
+            document.getElementById('workoutLiveCal').textContent = workoutLiveCal;
+            document.getElementById('workoutLiveDist').textContent = workoutLiveDist.toFixed(1);
+            document.getElementById('workoutLiveHeart').textContent = workoutLiveHeart || '--';
+        }
+        
+        // 暂停/继续运动
+        function pauseWorkout() {
+            const btn = document.getElementById('btnPauseWorkout');
+            const icon = document.getElementById('pauseIcon');
+            
+            workoutPaused = !workoutPaused;
+            
+            if (workoutPaused) {
+                btn.style.background = 'rgba(34,197,94,0.7)';
+                icon.className = 'fas fa-play';
+                Toast('⏸️ 运动已暂停');
+                // 更新状态标签
+                document.querySelector('#sportWorkoutActive .workout-status').innerHTML = 
+                    '<span style="display:inline-block;width:6px;height:6px;background:#F59E0B;border-radius:50%;margin-right:6px;"></span>已暂停';
+            } else {
+                btn.style.background = 'rgba(255,255,255,0.15)';
+                icon.className = 'fas fa-pause';
+                Toast('▶️ 运动继续');
+                document.querySelector('#sportWorkoutActive .workout-status') && 
+                    (document.querySelector('#sportWorkoutActive .workout-status').innerHTML = 
+                    '<span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;margin-right:6px;animation:blink 1s infinite;"></span>运动进行中');
+            }
+        }
+        
+        // 结束运动
+        function endWorkout() {
+            if (workoutSeconds < 10) {
+                if (!confirm('运动时间不到10秒，确定要结束吗？')) return;
+            } else {
+                if (!confirm(`运动了 ${formatWorkoutTime(workoutSeconds)}，消耗 ${workoutLiveCal} 千卡。确定结束吗？`)) return;
+            }
+            
+            // 停止计时器
+            clearInterval(workoutTimer);
+            workoutTimer = null;
+            
+            // 保存记录
+            const minutes = Math.ceil(workoutSeconds / 60);
+            const record = {
+                sport: selectedSportName,
+                icon: selectedSportIcon,
+                steps: 0,
+                calories: workoutLiveCal,
+                time: minutes,
+                heartRate: workoutLiveHeart,
+                distance: parseFloat(workoutLiveDist.toFixed(1)),
+                note: '计时运动',
+                date: new Date().toISOString()
+            };
+            
+            // 更新今日数据
+            if (!userData.workoutHistory) userData.workoutHistory = [];
+            userData.todayFitness.calories += workoutLiveCal;
+            userData.todayFitness.exerciseTime += minutes;
+            userData.todayFitness.distance += parseFloat(workoutLiveDist.toFixed(1));
+            if (workoutLiveHeart > 0) userData.todayFitness.heartRate = workoutLiveHeart;
+            userData.workoutHistory.push(record);
+            saveUserData();
+            updateAllDisplays();
+            
+            // 隐藏运动界面
+            document.getElementById('sportWorkoutActive').style.display = 'none';
+            document.getElementById('sportActionButtons').style.display = 'flex';
+            
+            // 刷新详情页
+            renderSportDetailPage();
+            
+            Toast(`✅ ${selectedSportName}完成！${formatWorkoutTime(workoutSeconds)} · ${workoutLiveCal}千卡`);
+            
+            // 在详情页内生成完成总结
+            showWorkoutSummary(record);
+        }
+        
+        // 格式化运动时间
+        function formatWorkoutTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            let result = '';
+            if (h > 0) result += h + '小时';
+            if (m > 0) result += m + '分钟';
+            if (s > 0 && h === 0) result += s + '秒';
+            return result || '0秒';
+        }
+        
+        // 显示运动完成总结（在详情页内插入）
+        function showWorkoutSummary(record) {
+            const historyList = document.getElementById('sportHistoryList');
+            const summaryHTML = `
+                <div style="background:linear-gradient(135deg,#ECFDF5,#EEF2FF);border-radius:16px;padding:20px;margin-bottom:12px;border:2px solid #6366F1;animation:fadeIn 0.5s;">
+                    <div style="text-align:center;margin-bottom:16px;">
+                        <div style="font-size:40px;margin-bottom:8px;">🎉</div>
+                        <div style="font-size:18px;font-weight:700;color:#1E293B;">${selectedSportName}完成！</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
+                        <div style="background:white;padding:12px;border-radius:12px;">
+                            <div style="font-size:24px;font-weight:700;color:#6366F1;">${formatWorkoutTime(workoutSeconds)}</div>
+                            <div style="font-size:11px;color:#94A3B8;">运动时长</div>
+                        </div>
+                        <div style="background:white;padding:12px;border-radius:12px;">
+                            <div style="font-size:24px;font-weight:700;color:#F59E0B;">${record.calories}</div>
+                            <div style="font-size:11px;color:#94A3B8;">千卡</div>
+                        </div>
+                        <div style="background:white;padding:12px;border-radius:12px;">
+                            <div style="font-size:24px;font-weight:700;color:#10B981;">${record.distance}</div>
+                            <div style="font-size:11px;color:#94A3B8;">公里</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // 插入到历史记录列表最前面
+            const currentHTML = historyList.innerHTML;
+            historyList.innerHTML = summaryHTML + currentHTML;
+            // 3秒后自动移除总结卡片
+            setTimeout(() => {
+                const summaryEl = historyList.querySelector('div:first-child');
+                if (summaryEl && summaryEl.querySelector('div:first-child').textContent === '🎉') {
+                    summaryEl.remove();
+                }
+            }, 5000);
+        }
+        
+        // 快速记录（手动输入）
+        function showQuickRecordModal() {
+            showSportRecordModal(selectedSportName, selectedSportIcon);
+        }
+        
         function selectSportAndRecord(name, icon) {
             selectedSportName = name;
             selectedSportIcon = icon;
@@ -3512,12 +3782,8 @@
             closeModal();
             Toast('✓ ' + selectedSportName + ' 记录已保存');
             
-            // 返回首页
-            setTimeout(() => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById('pageHome').classList.add('active');
-            }, 800);
+            // 刷新运动详情页数据
+            renderSportDetailPage();
         }
         
         // 添加自定义运动弹窗
