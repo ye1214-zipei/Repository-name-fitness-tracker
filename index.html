@@ -1,0 +1,4023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>运动+ | 健身骑行全能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --primary: #6366F1;
+            --secondary: #8B5CF6;
+            --accent: #EC4899;
+            --cycling: #F97316;
+            --fitness: #10B981;
+            --bg: #F8FAFC;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: var(--bg);
+            border-radius: 40px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            overflow: hidden;
+            min-height: calc(100vh - 20px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 登录页面 */
+        .login-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            background: linear-gradient(180deg, #EEF2FF 0%, white 100%);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-logo .icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 16px;
+            box-shadow: 0 10px 30px rgba(99,102,241,0.3);
+        }
+        
+        .login-logo h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1E293B;
+        }
+        
+        .login-logo p {
+            color: #64748B;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .login-tabs {
+            display: flex;
+            background: #E2E8F0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        
+        .login-tab {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            color: #64748B;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: all 0.25s;
+        }
+        
+        .login-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .login-form {
+            flex: 1;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: 0.2s;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+        
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: #94A3B8;
+            font-size: 13px;
+        }
+        
+        .login-divider::before, .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E2E8F0;
+        }
+        
+        .login-divider span {
+            padding: 0 16px;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
+            background: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .social-btn:hover {
+            background: #F8FAFC;
+            transform: translateY(-2px);
+        }
+        
+        /* APP头部 */
+        .app-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .header-title {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        
+        .header-date {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            overflow: hidden;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-details h2 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .user-details p {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+        
+        .streak-badge {
+            background: linear-gradient(135deg, #F59E0B, #EF4444);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 85px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 8px 24px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            border-radius: 24px 24px 0 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #94A3B8;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        .nav-item.active { 
+            color: var(--primary); 
+            background: #EEF2FF; 
+        }
+        
+        .nav-item i { font-size: 22px; }
+        
+        .nav-item:active { transform: scale(0.92); }
+        
+        /* 页面样式 */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 模式切换 */
+        .mode-tabs {
+            display: flex;
+            background: #E2E8F0;
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .mode-tab {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: none;
+            background: none;
+        }
+        
+        .mode-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .mode-tab.cycling.active {
+            background: var(--cycling);
+            color: white;
+        }
+        
+        /* 卡片 */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-title i { color: var(--primary); }
+        
+        /* 进度环 */
+        .progress-ring-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .progress-ring {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .progress-ring svg {
+            transform: rotate(-135deg);
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 14;
+            stroke-linecap: round;
+        }
+        
+        .progress-ring .bg { stroke: #E2E8F0; }
+        .progress-ring .progress { 
+            stroke: url(#gradient); 
+            stroke-dasharray: 565; 
+            stroke-dashoffset: 565; 
+            transition: stroke-dashoffset 0.8s ease-out; 
+        }
+        
+        .progress-ring .progress.orange { stroke: var(--cycling); }
+        
+        .ring-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .ring-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .ring-value.orange {
+            background: linear-gradient(135deg, var(--cycling), #EF4444);
+            -webkit-background-clip: text;
+        }
+        
+        .ring-label {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+        
+        .ring-goal {
+            font-size: 14px;
+            color: #64748B;
+            margin-top: 8px;
+        }
+        
+        /* 数据网格 */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .data-item {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .data-item:hover { background: #EEF2FF; transform: translateY(-2px); }
+        
+        .data-item .icon { font-size: 22px; margin-bottom: 6px; }
+        .data-item .value { font-size: 18px; font-weight: 700; color: #1E293B; }
+        .data-item .label { font-size: 11px; color: #94A3B8; margin-top: 4px; }
+        
+        .data-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .data-item-3 {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .data-item-3 .label { font-size: 12px; color: #64748B; }
+        .data-item-3 .value { font-size: 16px; font-weight: 700; margin-top: 4px; }
+        
+        /* 按钮 */
+        .btn {
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+        }
+        
+        .btn-cycling {
+            background: linear-gradient(135deg, var(--cycling), #EF4444);
+            box-shadow: 0 4px 15px rgba(249,115,22,0.3);
+        }
+        
+        .btn:active { transform: scale(0.97); }
+        
+        /* 骑行实时页面 */
+        .ride-live {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .ride-timer {
+            font-size: 64px;
+            font-weight: 800;
+            font-family: ui-monospace, monospace;
+            background: linear-gradient(135deg, var(--cycling), #EF4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .ride-distance {
+            font-size: 48px;
+            font-weight: 800;
+            color: #1E293B;
+        }
+        
+        .ride-distance span {
+            font-size: 24px;
+            color: #64748B;
+        }
+        
+        .live-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+        
+        .live-stat {
+            background: #F8FAFC;
+            border-radius: 16px;
+            padding: 18px 12px;
+        }
+        
+        .live-stat .val {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--cycling);
+        }
+        
+        .live-stat .lbl {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+        
+        .ride-controls {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin: 24px 0;
+        }
+        
+        .ride-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .ride-btn.play {
+            background: linear-gradient(135deg, #10B981, #059669);
+            box-shadow: 0 4px 20px rgba(16,185,129,0.4);
+        }
+        
+        .ride-btn.pause {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+        }
+        
+        .ride-btn.stop {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+        }
+        
+        .ride-btn:active { transform: scale(0.92); }
+        
+        /* 统计页面 */
+        .stats-section {
+            margin-bottom: 20px;
+        }
+        
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stats-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .period-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .period-tab {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #F1F5F9;
+            color: #64748B;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .period-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .stat-chart {
+            background: #F8FAFC;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 80px;
+            gap: 6px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--primary), #C7D2FE);
+            border-radius: 6px 6px 0 0;
+            transition: height 0.3s ease;
+            min-height: 4px;
+        }
+        
+        .chart-bar.orange {
+            background: linear-gradient(180deg, var(--cycling), #FED7AA);
+        }
+        
+        .chart-bar-label {
+            text-align: center;
+            font-size: 10px;
+            color: #94A3B8;
+            margin-top: 6px;
+        }
+        
+        .stat-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-card {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        
+        .stat-card .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .val {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1E293B;
+        }
+        
+        .stat-card .lbl {
+            font-size: 12px;
+            color: #64748B;
+        }
+        
+        /* 历史记录 */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        
+        .history-item:last-child { border-bottom: none; }
+        
+        .history-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .history-icon.run { background: #EEF2FF; }
+        .history-icon.ride { background: #FFF7ED; }
+        
+        .history-details { flex: 1; }
+        .history-details h4 { font-size: 14px; font-weight: 600; }
+        .history-details p { font-size: 12px; color: #94A3B8; }
+        
+        .history-stats {
+            text-align: right;
+        }
+        
+        .history-stats .main {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+        
+        .history-stats .sub {
+            font-size: 11px;
+            color: #94A3B8;
+        }
+        
+        /* 成就徽章 */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .badge-item {
+            text-align: center;
+            padding: 14px 8px;
+            background: #F1F5F9;
+            border-radius: 14px;
+        }
+        
+        .badge-item.unlocked {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            box-shadow: 0 4px 12px rgba(251,191,36,0.25);
+        }
+        
+        .badge-item i { font-size: 28px; margin-bottom: 6px; }
+        .badge-item .name { font-size: 10px; color: #64748B; }
+        
+        /* 目标设置 */
+        .goal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        
+        .goal-row:last-child { border-bottom: none; }
+        
+        .goal-info { display: flex; align-items: center; gap: 12px; }
+        .goal-info .icon { font-size: 24px; }
+        .goal-info .text h4 { font-size: 14px; font-weight: 600; }
+        .goal-info .text p { font-size: 12px; color: #94A3B8; }
+        
+        .goal-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .goal-value input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .goal-value input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 430px;
+            border-radius: 30px 30px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: #E2E8F0;
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
+            font-size: 15px;
+            transition: 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .input-field:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 2000;
+            animation: toastFade 2s forwards;
+        }
+        
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* 头像网格 */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+        }
+        
+        .avatar-option {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .avatar-option:hover { background: #E2E8F0; transform: scale(1.1); }
+        .avatar-option.selected { 
+            background: #EEF2FF; 
+            box-shadow: 0 0 0 3px var(--primary); 
+        }
+        
+        /* 身体数据 */
+        .body-data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .body-data-card {
+            background: #F8FAFC;
+            border-radius: 16px;
+            padding: 20px 12px;
+            text-align: center;
+        }
+        
+        .body-data-card .val {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .body-data-card .lbl {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+        
+        /* 心率区间 */
+        .hr-zones {
+            margin-top: 16px;
+        }
+        
+        .hr-zone {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+        }
+        
+        .hr-zone-bar {
+            flex: 1;
+            height: 24px;
+            background: #F1F5F9;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .hr-zone-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.3s;
+        }
+        
+        .hr-zone.z1 .hr-zone-fill { background: #CBD5E1; }
+        .hr-zone.z2 .hr-zone-fill { background: #60A5FA; }
+        .hr-zone.z3 .hr-zone-fill { background: #34D399; }
+        .hr-zone.z4 .hr-zone-fill { background: #FBBF24; }
+        .hr-zone.z5 .hr-zone-fill { background: #EF4444; }
+        
+        .hr-zone-label {
+            width: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* 周榜 */
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .rank-item.me {
+            background: #EEF2FF;
+            border: 2px solid var(--primary);
+        }
+        
+        .rank-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .rank-num.gold { background: #FEF3C7; color: #D97706; }
+        .rank-num.silver { background: #F1F5F9; color: #64748B; }
+        .rank-num.bronze { background: #FED7AA; color: #C2410C; }
+        
+        .rank-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .rank-info { flex: 1; }
+        .rank-info h4 { font-size: 14px; font-weight: 600; }
+        .rank-info p { font-size: 11px; color: #94A3B8; }
+        
+        .rank-value {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* 我的页面 */
+        .profile-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(99,102,241,0.3);
+            cursor: pointer;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1E293B;
+        }
+        
+        .profile-sig {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-top: 4px;
+        }
+        
+        .profile-edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #EEF2FF;
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat .val {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .profile-stat .lbl {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+        
+        /* 邀约页面 */
+        .invite-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .invite-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .invite-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .invite-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .invite-info p {
+            font-size: 12px;
+            color: #64748B;
+        }
+        
+        .invite-content {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .invite-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #EEF2FF;
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .invite-type.cycling {
+            background: #FFF7ED;
+            color: var(--cycling);
+        }
+        
+        .invite-detail {
+            font-size: 13px;
+            color: #64748B;
+        }
+        
+        .invite-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .invite-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .invite-btn.accept {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+        
+        .invite-btn.decline {
+            background: #F1F5F9;
+            color: #64748B;
+        }
+        
+        .invite-btn.joined {
+            background: #FEE2E2;
+            color: #EF4444;
+        }
+        
+        .create-invite-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+        }
+        
+        .invite-methods {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .invite-method-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 8px;
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .invite-method-btn:hover {
+            background: #F8FAFC;
+            border-color: #6366F1;
+        }
+        
+        .invite-method-btn i {
+            font-size: 24px;
+            color: #6366F1;
+        }
+        
+        .invite-method-btn span {
+            font-size: 12px;
+            color: #64748B;
+        }
+        
+        /* 运动类型网格 */
+        .sport-type-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        
+        .sport-type-grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 4px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sport-type-grid-item:hover {
+            background: #EEF2FF;
+            border-color: #6366F1;
+        }
+        
+        .sport-type-grid-item .sport-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .sport-type-grid-item .sport-name {
+            font-size: 11px;
+            color: #64748B;
+            text-align: center;
+        }
+        
+        /* 好友列表 */
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .friend-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .friend-info p {
+            font-size: 12px;
+            color: #64748B;
+        }
+        
+        .friend-action {
+            padding: 8px 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 400px) {
+            body { padding: 5px; }
+            .app-container { border-radius: 30px; }
+        }
+        
+        .text-gray-400 { color: #94A3B8; }
+        .text-sm { font-size: 13px; }
+        .text-xl { font-size: 20px; }
+        .font-bold { font-weight: 700; }
+        .text-indigo-600 { color: var(--primary); }
+        .bg-gray-50 { background: #F9FAFB; }
+        .rounded-xl { border-radius: 16px; }
+        .p-4 { padding: 16px; }
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-4 { margin-bottom: 16px; }
+        .mb-2 { margin-bottom: 8px; }
+        .py-3 { padding-top: 12px; padding-bottom: 12px; }
+        .w-full { width: 100%; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .border-b { border-bottom: 1px solid #E5E7EB; }
+        .border-gray-100 { border-color: #F3F4F6; }
+        .space-y-3 > * + * { margin-top: 12px; }
+        .font-medium { font-weight: 500; }
+        
+        .toggle {
+            width: 50px;
+            height: 28px;
+            background: #E2E8F0;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle.active {
+            background: var(--primary);
+        }
+        
+        .toggle.active::after {
+            left: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 登录页面 -->
+        <div class="login-page" id="loginPage">
+            <div class="login-logo">
+                <div class="icon">🏃</div>
+                <h1>运动+</h1>
+                <p>健身骑行全能助手</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('login')">登录</button>
+                <button class="login-tab" onclick="switchLoginTab('register')">注册</button>
+            </div>
+            
+            <div class="login-form">
+                <!-- 登录表单 -->
+                <div id="loginForm">
+                    <input type="text" class="login-input" id="loginUsername" placeholder="用户名/手机号">
+                    <input type="password" class="login-input" id="loginPassword" placeholder="密码">
+                    <button class="login-btn" onclick="handleLogin()">登 录</button>
+                </div>
+                
+                <!-- 注册表单 -->
+                <div id="registerForm" style="display:none;">
+                    <input type="text" class="login-input" id="regUsername" placeholder="设置用户名">
+                    <input type="tel" class="login-input" id="regPhone" placeholder="手机号">
+                    <input type="password" class="login-input" id="regPassword" placeholder="设置密码">
+                    <input type="password" class="login-input" id="regPassword2" placeholder="确认密码">
+                    <button class="login-btn" onclick="handleRegister()">注 册</button>
+                </div>
+                
+                <div class="login-divider"><span>或</span></div>
+                
+                <div class="social-login">
+                    <button class="social-btn" onclick="socialLogin('wechat')">💬</button>
+                    <button class="social-btn" onclick="socialLogin('qq')">🐧</button>
+                    <button class="social-btn" onclick="socialLogin('weibo')">📱</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- APP主体 -->
+        <div id="appMain" style="display:none;flex-direction:column;flex:1;">
+            <!-- 头部 -->
+            <div class="app-header">
+                <div class="header-top">
+                    <div class="header-title">🏃 运动+</div>
+                    <div class="streak-badge">
+                        <i class="fas fa-fire"></i>
+                        <span id="streakCount">0</span>天连续
+                    </div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="headerAvatar">🚴</div>
+                    <div class="user-details">
+                        <h2 id="headerNickname">运动达人</h2>
+                        <p id="headerSignature">每天运动，健康生活</p>
+                    </div>
+                    <button onclick="showSettingsModal()" style="margin-left:auto;background:none;border:none;color:white;font-size:20px;cursor:pointer;">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 内容 -->
+            <div class="app-content">
+                <!-- 首页 - 健身 -->
+                <div id="pageHome" class="page active">
+                    <div class="mode-tabs">
+                        <button class="mode-tab active" onclick="switchMode('fitness')">
+                            <i class="fas fa-dumbbell"></i> 健身
+                        </button>
+                        <button class="mode-tab cycling" onclick="switchMode('cycling')">
+                            <i class="fas fa-bicycle"></i> 骑行
+                        </button>
+                    </div>
+                    
+                    <!-- 健身模式 -->
+                    <div id="fitnessPanel">
+                        <div class="card">
+                            <div class="card-title"><i class="fas fa-shoe-prints"></i> 今日步数</div>
+                            <div class="progress-ring-container">
+                                <div class="progress-ring">
+                                    <svg width="180" height="180">
+                                        <defs>
+                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:#6366F1"/>
+                                                <stop offset="100%" style="stop-color:#8B5CF6"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <circle class="bg" cx="90" cy="90" r="70"/>
+                                        <circle class="progress" id="stepProgress" cx="90" cy="90" r="70"/>
+                                    </svg>
+                                    <div class="ring-content">
+                                        <div class="ring-value" id="stepCount">0</div>
+                                        <div class="ring-label">步</div>
+                                        <div class="ring-goal">目标 <span id="stepGoal">10,000</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title"><i class="fas fa-chart-bar"></i> 详细数据</div>
+                            <div class="data-grid">
+                                <div class="data-item" onclick="showDetail('steps')">
+                                    <div class="icon">👟</div>
+                                    <div class="value" id="stepsVal">0</div>
+                                    <div class="label">步数</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('cal')">
+                                    <div class="icon">🔥</div>
+                                    <div class="value" id="calVal">0</div>
+                                    <div class="label">卡路里</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('time')">
+                                    <div class="icon">⏱️</div>
+                                    <div class="value" id="timeVal">0m</div>
+                                    <div class="label">运动时长</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('heart')">
+                                    <div class="icon">❤️</div>
+                                    <div class="value" id="heartVal">0</div>
+                                    <div class="label">心率</div>
+                                </div>
+                            </div>
+                            <div class="data-grid-3">
+                                <div class="data-item-3" onclick="showDetail('distance')">
+                                    <div class="label">🏃 距离</div>
+                                    <div class="value" id="distVal">0 km</div>
+                                </div>
+                                <div class="data-item-3" onclick="showDetail('intensity')">
+                                    <div class="label">⚡ 强度</div>
+                                    <div class="value" id="intensityVal">低</div>
+                                </div>
+                                <div class="data-item-3" onclick="showDetail('pace')">
+                                    <div class="label">🎯 配速</div>
+                                    <div class="value" id="paceVal">0'00"</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+                                <span><i class="fas fa-heartbeat"></i> 运动类型</span>
+                                <button onclick="toggleHomeSportExpand()" id="homeMoreSportBtn" style="background:none;border:none;color:#6366F1;font-size:14px;font-weight:600;cursor:pointer;padding:4px 8px;">
+                                    更多运动 <i class="fas fa-chevron-down" style="font-size:12px;"></i>
+                                </button>
+                            </div>
+                            <div id="homeSportMain" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                                <div class="data-item" onclick="showSportSelectPage()" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;cursor:pointer;">
+                                    <div class="icon" style="font-size:28px;">➕</div>
+                                    <div class="label" style="color:white;font-weight:600;">添加运动</div>
+                                </div>
+                                <div class="data-item" onclick="goToSportPage('跑步','🏃')" style="background:#EEF2FF;cursor:pointer;">
+                                    <div class="icon">🏃</div>
+                                    <div class="label">跑步</div>
+                                </div>
+                                <div class="data-item" onclick="goToSportPage('走路','🚶')" style="background:#F0FDF4;cursor:pointer;">
+                                    <div class="icon">🚶</div>
+                                    <div class="label">走路</div>
+                                </div>
+                                <div class="data-item" onclick="goToSportPage('健身','🏋️')" style="background:#FEF3C7;cursor:pointer;">
+                                    <div class="icon">🏋️</div>
+                                    <div class="label">健身</div>
+                                </div>
+                                <div class="data-item" onclick="goToSportPage('游泳','🏊')" style="background:#E0F2FE;cursor:pointer;">
+                                    <div class="icon">🏊</div>
+                                    <div class="label">游泳</div>
+                                </div>
+                                <div class="data-item" onclick="goToSportPage('瑜伽','🧘')" style="background:#FCE7F3;cursor:pointer;">
+                                    <div class="icon">🧘</div>
+                                    <div class="label">瑜伽</div>
+                                </div>
+                            </div>
+                            <div id="homeSportExpand" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;display:none;">
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="showWorkoutModal()">
+                            <i class="fas fa-plus"></i> 记录运动数据
+                        </button>
+                    </div>
+                    
+                    <!-- 骑行模式 -->
+                    <div id="cyclingPanel" style="display:none;">
+                        <div class="card">
+                            <div class="card-title"><i class="fas fa-bicycle" style="color:#F97316;"></i> 本周骑行</div>
+                            <div class="progress-ring-container">
+                                <div class="progress-ring">
+                                    <svg width="180" height="180">
+                                        <circle class="bg" cx="90" cy="90" r="70"/>
+                                        <circle class="progress orange" id="rideProgress" cx="90" cy="90" r="70"/>
+                                    </svg>
+                                    <div class="ring-content">
+                                        <div class="ring-value orange" id="weekRideDist">0</div>
+                                        <div class="ring-label">公里</div>
+                                        <div class="ring-goal">本周目标 <span id="rideGoal">100</span>km</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title"><i class="fas fa-tachometer-alt" style="color:#F97316;"></i> 骑行数据</div>
+                            <div class="data-grid">
+                                <div class="data-item" onclick="showDetail('totalDist')">
+                                    <div class="icon">🛣️</div>
+                                    <div class="value" id="totalDist">0</div>
+                                    <div class="label">总里程</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('totalTime')">
+                                    <div class="icon">⏱️</div>
+                                    <div class="value" id="totalTime">0h</div>
+                                    <div class="label">总时长</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('avgSpeed')">
+                                    <div class="icon">📊</div>
+                                    <div class="value" id="avgSpeed">0</div>
+                                    <div class="label">均速</div>
+                                </div>
+                                <div class="data-item" onclick="showDetail('maxSpeed')">
+                                    <div class="icon">⚡</div>
+                                    <div class="value" id="maxSpeed">0</div>
+                                    <div class="label">极速</div>
+                                </div>
+                            </div>
+                            <div class="data-grid-3">
+                                <div class="data-item-3" onclick="showDetail('elevation')">
+                                    <div class="label">⛰️ 总爬升</div>
+                                    <div class="value" id="totalElev">0 m</div>
+                                </div>
+                                <div class="data-item-3" onclick="showDetail('avgCadence')">
+                                    <div class="label">🔄 踏频</div>
+                                    <div class="value" id="avgCadence">0</div>
+                                </div>
+                                <div class="data-item-3" onclick="showDetail('avgPower')">
+                                    <div class="label">💪 功率</div>
+                                    <div class="value" id="avgPower">0W</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-cycling" onclick="switchPage('Ride')">
+                            <i class="fas fa-play"></i> 开始骑行
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 骑行页面 -->
+                <div id="pageRide" class="page">
+                    <div class="card ride-live">
+                        <div class="ride-timer" id="rideTimer">00:00:00</div>
+                        <div class="ride-distance">
+                            <span id="rideDistance">0.00</span>
+                            <span>km</span>
+                        </div>
+                        
+                        <div class="live-stats">
+                            <div class="live-stat">
+                                <div class="val" id="liveSpeed">0.0</div>
+                                <div class="lbl">km/h 当前</div>
+                            </div>
+                            <div class="live-stat">
+                                <div class="val" id="liveMaxSpeed">0.0</div>
+                                <div class="lbl">km/h 极速</div>
+                            </div>
+                            <div class="live-stat">
+                                <div class="val" id="liveElev">0</div>
+                                <div class="lbl">m 爬升</div>
+                            </div>
+                        </div>
+                        
+                        <div class="live-stats" style="margin-top:8px;">
+                            <div class="live-stat">
+                                <div class="val" id="liveCadence">0</div>
+                                <div class="lbl">spm 踏频</div>
+                            </div>
+                            <div class="live-stat">
+                                <div class="val" id="livePower">0</div>
+                                <div class="lbl">W 功率</div>
+                            </div>
+                            <div class="live-stat">
+                                <div class="val" id="liveHeart">0</div>
+                                <div class="lbl">bpm 心率</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ride-controls">
+                            <button class="ride-btn play" id="playBtn" onclick="toggleRide()">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="ride-btn stop" onclick="finishRide()">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                        </div>
+                        
+                        <p class="text-gray-500 text-sm" id="rideTip">💡 按下开始，记录你的骑行</p>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="background:#64748B;" onclick="switchPage('Home')">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </button>
+                </div>
+                
+                <!-- 运动选择页面 -->
+                <div id="pageSportSelect" class="page" style="background:#F8FAFC;">
+                    <div style="padding:20px;">
+                        <div style="display:flex;align-items:center;margin-bottom:20px;">
+                            <button onclick="switchPage('Home')" style="background:none;border:none;font-size:20px;color:#64748B;cursor:pointer;padding:8px;">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 style="flex:1;text-align:center;font-size:18px;font-weight:700;color:#1E293B;margin-right:40px;">选择运动类型</h2>
+                        </div>
+                        
+                        <!-- 搜索栏 -->
+                        <div style="position:relative;margin-bottom:16px;">
+                            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94A3B8;"></i>
+                            <input type="text" id="sportSearchInput" placeholder="搜索运动类型..." oninput="filterSports(this.value)" 
+                                style="width:100%;padding:12px 12px 12px 40px;border:1px solid #E2E8F0;border-radius:12px;font-size:14px;background:white;outline:none;">
+                        </div>
+                        
+                        <!-- 添加自定义运动 -->
+                        <button onclick="showAddCustomSportModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <i class="fas fa-plus"></i> 添加自定义运动
+                        </button>
+                        
+                        <!-- 运动分类标签 -->
+                        <div id="sportCategoryTabs" style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+                            <button onclick="filterSportCategory('all')" class="sport-cat-btn active" style="padding:6px 14px;background:#6366F1;color:white;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">全部</button>
+                            <button onclick="filterSportCategory('aerobic')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">有氧</button>
+                            <button onclick="filterSportCategory('strength')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">力量</button>
+                            <button onclick="filterSportCategory('ball')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">球类</button>
+                            <button onclick="filterSportCategory('combat')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">格斗</button>
+                            <button onclick="filterSportCategory('extreme')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">极限</button>
+                            <button onclick="filterSportCategory('outdoor')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">户外</button>
+                            <button onclick="filterSportCategory('leisure')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">休闲</button>
+                            <button onclick="filterSportCategory('water')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">水上</button>
+                            <button onclick="filterSportCategory('snow')" class="sport-cat-btn" style="padding:6px 14px;background:#E2E8F0;color:#64748B;border:none;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;">冰雪</button>
+                        </div>
+                        
+                        <!-- 运动网格 -->
+                        <div id="sportSelectGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 运动详情页面 -->
+                <div id="pageSportDetail" class="page" style="background:#F8FAFC;">
+                    <div style="padding:20px;">
+                        <!-- 返回按钮和标题 -->
+                        <div style="display:flex;align-items:center;margin-bottom:20px;">
+                            <button onclick="switchPage('Home')" style="background:none;border:none;font-size:20px;color:#64748B;cursor:pointer;padding:8px;">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 style="flex:1;text-align:center;font-size:18px;font-weight:700;color:#1E293B;margin-right:40px;" id="sportPageTitle">运动详情</h2>
+                        </div>
+                        
+                        <!-- 运动卡片头部 -->
+                        <div id="sportDetailHeader" style="text-align:center;padding:24px 20px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:20px;margin-bottom:20px;box-shadow:0 8px 24px rgba(99,102,241,0.3);">
+                            <div style="font-size:72px;margin-bottom:12px;" id="sportDetailIcon">🏃</div>
+                            <h2 style="font-size:28px;font-weight:800;color:white;margin-bottom:8px;" id="sportDetailName">跑步</h2>
+                            <p style="color:rgba(255,255,255,0.85);font-size:14px;" id="sportDetailSummary">累计运动 0 次</p>
+                            <div style="margin-top:16px;display:flex;justify-content:center;gap:20px;">
+                                <div style="text-align:center;">
+                                    <div style="color:white;font-size:20px;font-weight:700;" id="sportTotalCount">0</div>
+                                    <div style="color:rgba(255,255,255,0.7);font-size:11px;">总次数</div>
+                                </div>
+                                <div style="width:1px;background:rgba(255,255,255,0.3);"></div>
+                                <div style="text-align:center;">
+                                    <div style="color:white;font-size:20px;font-weight:700;" id="sportTotalTime">0</div>
+                                    <div style="color:rgba(255,255,255,0.7);font-size:11px;">总分钟</div>
+                                </div>
+                                <div style="width:1px;background:rgba(255,255,255,0.3);"></div>
+                                <div style="text-align:center;">
+                                    <div style="color:white;font-size:20px;font-weight:700;" id="sportTotalCal">0</div>
+                                    <div style="color:rgba(255,255,255,0.7);font-size:11px;">千卡</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 快捷记录按钮 -->
+                        <button onclick="showSportRecordModal(selectedSportName, selectedSportIcon)" style="width:100%;padding:16px;background:white;color:#6366F1;border:2px solid #6366F1;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(99,102,241,0.2);">
+                            <i class="fas fa-plus-circle"></i> 记录本次运动
+                        </button>
+                        
+                        <!-- 本周趋势 -->
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-chart-line" style="color:#6366F1;"></i> 本周趋势
+                            </div>
+                            <div id="sportWeeklyChart" style="display:flex;align-items:flex-end;justify-content:space-between;height:120px;padding:10px 0;">
+                                <!-- 图表将由JS动态生成 -->
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;padding:0 10px;">
+                                <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 个人最佳 -->
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-trophy" style="color:#F59E0B;"></i> 个人最佳
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;" id="sportBestRecords">
+                                <div style="background:#FEF3C7;padding:12px;border-radius:12px;text-align:center;">
+                                    <div style="font-size:24px;">🔥</div>
+                                    <div style="font-size:18px;font-weight:700;color:#D97706;" id="sportBestCal">0</div>
+                                    <div style="font-size:11px;color:#92400E;">最高热量</div>
+                                </div>
+                                <div style="background:#DBEAFE;padding:12px;border-radius:12px;text-align:center;">
+                                    <div style="font-size:24px;">⏱️</div>
+                                    <div style="font-size:18px;font-weight:700;color:#2563EB;" id="sportBestTime">0</div>
+                                    <div style="font-size:11px;color:#1E40AF;">最长时长</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 成就徽章 -->
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-medal" style="color:#EC4899;"></i> 成就徽章
+                            </div>
+                            <div style="display:flex;gap:12px;overflow-x:auto;padding:4px 0;" id="sportBadges">
+                                <div style="min-width:70px;background:#F8FAFC;padding:12px;border-radius:12px;text-align:center;opacity:0.5;" id="badge-first">
+                                    <div style="font-size:28px;">🌟</div>
+                                    <div style="font-size:10px;color:#64748B;">初次尝试</div>
+                                </div>
+                                <div style="min-width:70px;background:#F8FAFC;padding:12px;border-radius:12px;text-align:center;opacity:0.5;" id="badge-10">
+                                    <div style="font-size:28px;">🏆</div>
+                                    <div style="font-size:10px;color:#64748B;">完成10次</div>
+                                </div>
+                                <div style="min-width:70px;background:#F8FAFC;padding:12px;border-radius:12px;text-align:center;opacity:0.5;" id="badge-100cal">
+                                    <div style="font-size:28px;">💪</div>
+                                    <div style="font-size:10px;color:#64748B;">燃烧100卡</div>
+                                </div>
+                                <div style="min-width:70px;background:#F8FAFC;padding:12px;border-radius:12px;text-align:center;opacity:0.5;" id="badge-master">
+                                    <div style="font-size:28px;">👑</div>
+                                    <div style="font-size:10px;color:#64748B;">运动大师</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 历史记录 -->
+                        <div style="margin-bottom:12px;">
+                            <h3 style="font-size:16px;font-weight:700;color:#1E293B;margin-bottom:12px;">
+                                <i class="fas fa-history" style="color:#6366F1;margin-right:6px;"></i> 历史记录
+                            </h3>
+                            <div id="sportHistoryList" class="sport-history-list">
+                                <div style="text-align:center;padding:40px;color:#94A3B8;background:white;border-radius:16px;">
+                                    <div style="font-size:48px;margin-bottom:12px;">📝</div>
+                                    <p>暂无记录</p>
+                                    <p style="font-size:12px;margin-top:4px;">点击上方"记录本次运动"开始吧</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 邀约页面 -->
+                <div id="pageInvite" class="page">
+                    <button class="create-invite-btn" onclick="showCreateInviteModal()">
+                        <i class="fas fa-plus-circle"></i> 创建运动邀约
+                    </button>
+                    
+                    <!-- 邀约方式入口 -->
+                    <div class="invite-methods">
+                        <button class="invite-method-btn" onclick="showQRCodeModal()">
+                            <i class="fas fa-qrcode"></i>
+                            <span>扫码加入</span>
+                        </button>
+                        <button class="invite-method-btn" onclick="showShareLinkModal()">
+                            <i class="fas fa-link"></i>
+                            <span>分享链接</span>
+                        </button>
+                        <button class="invite-method-btn" onclick="showAddFriendModal()">
+                            <i class="fas fa-user-plus"></i>
+                            <span>添加好友</span>
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-bullseye"></i> 待接受的邀约</div>
+                        <div id="inviteList">
+                            <p style="text-align:center;color:#94A3B8;padding:20px;">暂无邀约，快发起一个吧！</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-users"></i> 好友列表
+                            <button onclick="showAddFriendModal()" style="margin-left:auto;background:#6366F1;color:#fff;border:none;border-radius:12px;padding:4px 10px;font-size:12px;cursor:pointer;">
+                                <i class="fas fa-plus"></i> 添加
+                            </button>
+                        </div>
+                        <div id="friendList"></div>
+                    </div>
+                </div>
+                
+                <!-- 统计页面 -->
+                <div id="pageStats" class="page">
+                    <div class="stats-section">
+                        <div class="stats-header">
+                            <div class="stats-title"><i class="fas fa-chart-bar" style="color:#6366F1;"></i> 健身统计</div>
+                            <div class="period-tabs" id="fitnessPeriodTabs">
+                                <button class="period-tab" onclick="setStatsPeriod('day', 'fitness')">日</button>
+                                <button class="period-tab" onclick="setStatsPeriod('week', 'fitness')">周</button>
+                                <button class="period-tab active" onclick="setStatsPeriod('month', 'fitness')">月</button>
+                                <button class="period-tab" onclick="setStatsPeriod('year', 'fitness')">年</button>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-chart">
+                            <div class="chart-bars" id="fitnessChart">
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">一</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">二</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">三</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">四</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">五</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">六</div></div>
+                                <div class="chart-bar" style="height:0%"><div class="chart-bar-label">日</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-summary">
+                            <div class="stat-card">
+                                <div class="icon">👟</div>
+                                <div class="val" id="statSteps">0</div>
+                                <div class="lbl" id="statStepsLbl">本月步数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">🔥</div>
+                                <div class="val" id="statCal">0</div>
+                                <div class="lbl" id="statCalLbl">本月卡路里</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">⏱️</div>
+                                <div class="val" id="statTime">0h</div>
+                                <div class="lbl" id="statTimeLbl">运动时长</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">🏃</div>
+                                <div class="val" id="statDays">0</div>
+                                <div class="lbl" id="statDaysLbl">运动天数</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <div class="stats-header">
+                            <div class="stats-title"><i class="fas fa-bicycle" style="color:#F97316;"></i> 骑行统计</div>
+                            <div class="period-tabs" id="cyclingPeriodTabs">
+                                <button class="period-tab" onclick="setStatsPeriod('day', 'cycling')">日</button>
+                                <button class="period-tab" onclick="setStatsPeriod('week', 'cycling')">周</button>
+                                <button class="period-tab active" onclick="setStatsPeriod('month', 'cycling')">月</button>
+                                <button class="period-tab" onclick="setStatsPeriod('year', 'cycling')">年</button>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-chart">
+                            <div class="chart-bars" id="cyclingChart">
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">一</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">二</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">三</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">四</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">五</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">六</div></div>
+                                <div class="chart-bar orange" style="height:0%"><div class="chart-bar-label">日</div></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-summary">
+                            <div class="stat-card">
+                                <div class="icon">🛣️</div>
+                                <div class="val" id="statRides">0km</div>
+                                <div class="lbl">本周骑行</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">⏱️</div>
+                                <div class="val" id="statRideTime">0h</div>
+                                <div class="lbl">骑行时长</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">⚡</div>
+                                <div class="val" id="statMaxSpd">0</div>
+                                <div class="lbl">最高时速</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">⛰️</div>
+                                <div class="val" id="statElev">0</div>
+                                <div class="lbl">总爬升</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-history"></i> 运动历史</div>
+                        <div id="historyList">
+                            <p style="text-align:center;color:#94A3B8;padding:20px;">暂无记录</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 我的页面 -->
+                <div id="pageProfile" class="page">
+                    <div class="card">
+                        <div class="profile-header">
+                            <div class="profile-avatar" id="profileAvatar" onclick="showEditProfileModal()">🚴</div>
+                            <div class="profile-name" id="profileNickname">运动达人</div>
+                            <div class="profile-sig" id="profileSignature">每天运动，健康生活</div>
+                            <button class="profile-edit-btn" onclick="showEditProfileModal()">
+                                <i class="fas fa-edit"></i> 编辑资料
+                            </button>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="val" id="profileWorkouts">0</div>
+                                <div class="lbl">运动次数</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="val" id="profileDays">0</div>
+                                <div class="lbl">连续天数</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="val" id="profileCal">0</div>
+                                <div class="lbl">累计卡路里</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-bullseye"></i> 运动目标
+                            <span id="goalSaveIndicator" style="font-size:12px;color:#10B981;opacity:0;transition:opacity 0.3s;margin-left:auto;">
+                                <i class="fas fa-check-circle"></i> 已保存
+                            </span>
+                        </div>
+                        <div class="goal-row">
+                            <div class="goal-info">
+                                <div class="icon">👟</div>
+                                <div class="text">
+                                    <h4>每日步数</h4>
+                                    <p>目标设定</p>
+                                </div>
+                            </div>
+                            <div class="goal-value">
+                                <input type="number" id="goalSteps" value="10000" oninput="saveGoals()">
+                                <span class="text-gray-400">步</span>
+                            </div>
+                        </div>
+                        <div class="goal-row">
+                            <div class="goal-info">
+                                <div class="icon">🔥</div>
+                                <div class="text">
+                                    <h4>每日卡路里</h4>
+                                    <p>消耗目标</p>
+                                </div>
+                            </div>
+                            <div class="goal-value">
+                                <input type="number" id="goalCal" value="500" oninput="saveGoals()">
+                                <span class="text-gray-400">卡</span>
+                            </div>
+                        </div>
+                        <div class="goal-row">
+                            <div class="goal-info">
+                                <div class="icon">🛣️</div>
+                                <div class="text">
+                                    <h4>每周骑行</h4>
+                                    <p>里程目标</p>
+                                </div>
+                            </div>
+                            <div class="goal-value">
+                                <input type="number" id="goalRides" value="100" oninput="saveGoals()">
+                                <span class="text-gray-400">km</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-heartbeat"></i> 身体数据
+                            <span id="bodySaveIndicator" style="font-size:12px;color:#10B981;opacity:0;transition:opacity 0.3s;margin-left:auto;">
+                                <i class="fas fa-check-circle"></i> 已保存
+                            </span>
+                        </div>
+                        <div class="body-data-grid">
+                            <div class="body-data-card">
+                                <div class="val" id="bodyWeight">70</div>
+                                <div class="lbl">体重(kg)</div>
+                            </div>
+                            <div class="body-data-card">
+                                <div class="val" id="bodyHeight">175</div>
+                                <div class="lbl">身高(cm)</div>
+                            </div>
+                            <div class="body-data-card">
+                                <div class="val" id="bodyFTP">220</div>
+                                <div class="lbl">FTP(W)</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:12px;background:#F8FAFC;border-radius:12px;">
+                            <div>
+                                <div class="text-sm text-gray-500">功率体重比</div>
+                                <div class="text-xl font-bold text-indigo-600" id="bodyWkg">3.1 W/kg</div>
+                            </div>
+                            <button class="px-4 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold" onclick="showBodyDataModal()" style="padding:8px 16px;background:#EEF2FF;color:var(--primary);border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+                                编辑
+                            </button>
+                        </div>
+                        
+                        <div class="hr-zones">
+                            <div class="text-sm font-bold mb-2" style="font-weight:600;color:#64748B;">心率区间</div>
+                            <div class="hr-zone z1"><span class="hr-zone-label">Z1</span><div class="hr-zone-bar"><div class="hr-zone-fill" style="width:100%"></div></div><span class="text-xs text-gray-500">112-130</span></div>
+                            <div class="hr-zone z2"><span class="hr-zone-label">Z2</span><div class="hr-zone-bar"><div class="hr-zone-fill" style="width:0%"></div></div><span class="text-xs text-gray-500">130-148</span></div>
+                            <div class="hr-zone z3"><span class="hr-zone-label">Z3</span><div class="hr-zone-bar"><div class="hr-zone-fill" style="width:0%"></div></div><span class="text-xs text-gray-500">148-165</span></div>
+                            <div class="hr-zone z4"><span class="hr-zone-label">Z4</span><div class="hr-zone-bar"><div class="hr-zone-fill" style="width:0%"></div></div><span class="text-xs text-gray-500">165-175</span></div>
+                            <div class="hr-zone z5"><span class="hr-zone-label">Z5</span><div class="hr-zone-bar"><div class="hr-zone-fill" style="width:0%"></div></div><span class="text-xs text-gray-500">175-186</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-trophy" style="color:#F59E0B;"></i> 成就徽章</div>
+                        <div class="badge-grid">
+                            <div class="badge-item">
+                                <i class="fas fa-shoe-prints" style="color:#CBD5E1;"></i>
+                                <div class="name">初次运动</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-fire" style="color:#CBD5E1;"></i>
+                                <div class="name">连续7天</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-bicycle" style="color:#CBD5E1;"></i>
+                                <div class="name">百公里</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-mountain" style="color:#CBD5E1;"></i>
+                                <div class="name">爬坡王</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-bolt" style="color:#CBD5E1;"></i>
+                                <div class="name">极速50+</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-running" style="color:#CBD5E1;"></i>
+                                <div class="name">马拉松</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-swimmer" style="color:#CBD5E1;"></i>
+                                <div class="name">游泳达人</div>
+                            </div>
+                            <div class="badge-item">
+                                <i class="fas fa-medal" style="color:#CBD5E1;"></i>
+                                <div class="name">月冠军</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-crown" style="color:#F59E0B;"></i> 周榜排名</div>
+                        <div id="rankList">
+                            <div class="rank-item">
+                                <div class="rank-num gold">1</div>
+                                <div class="rank-avatar">🏃</div>
+                                <div class="rank-info"><h4>王队</h4><p>本周运动</p></div>
+                                <div class="rank-value">168km</div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-num silver">2</div>
+                                <div class="rank-avatar">🚴</div>
+                                <div class="rank-info"><h4>爬坡小旋</h4><p>本周运动</p></div>
+                                <div class="rank-value">142km</div>
+                            </div>
+                            <div class="rank-item me">
+                                <div class="rank-num bronze">3</div>
+                                <div class="rank-avatar" id="myRankAvatar">🚴</div>
+                                <div class="rank-info"><h4 id="myRankName">你</h4><p>本周运动</p></div>
+                                <div class="rank-value" id="myRankValue">0km</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <button class="nav-item active" onclick="switchPage('Home')">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </button>
+                <button class="nav-item" onclick="switchPage('Ride')">
+                    <i class="fas fa-bicycle"></i>
+                    <span>骑行</span>
+                </button>
+                <button class="nav-item" onclick="switchPage('Invite')">
+                    <i class="fas fa-users"></i>
+                    <span>邀约</span>
+                </button>
+                <button class="nav-item" onclick="switchPage('Stats')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>统计</span>
+                </button>
+                <button class="nav-item" onclick="switchPage('Profile')">
+                    <i class="fas fa-user"></i>
+                    <span>我的</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        // ========== 数据 ==========
+        let defaultUserData = {
+            profile: {
+                nickname: '运动达人',
+                signature: '每天运动，健康生活',
+                avatar: '🚴'
+            },
+            settings: { darkMode: false, voiceGuide: true },
+            goals: { steps: 10000, calories: 500, weeklyRides: 100 },
+            bodyData: { weight: 70, height: 175, ftp: 220 },
+            todayFitness: {
+                steps: 0, calories: 0, exerciseTime: 0,
+                heartRate: 0, distance: 0, intensity: '低', pace: "0'00\""
+            },
+            rides: [],
+            streak: 0,
+            weeklyFitness: [0, 0, 0, 0, 0, 0, 0],
+            invites: [],
+            // 预设运动类型 + 用户自定义类型
+            sportTypes: [
+                // 有氧运动
+                { name: '跑步', icon: '🏃', custom: false },
+                { name: '快走', icon: '🚶', custom: false },
+                { name: '骑行', icon: '🚴', custom: false },
+                { name: '游泳', icon: '🏊', custom: false },
+                { name: '跳绳', icon: '🪢', custom: false },
+                { name: ' HIIT', icon: '💪', custom: false },
+                { name: '有氧操', icon: '🎵', custom: false },
+                { name: '跑步机', icon: '🏃', custom: false },
+                { name: '动感单车', icon: '🚴', custom: false },
+                // 力量训练
+                { name: '健身', icon: '🏋️', custom: false },
+                { name: '举重', icon: '🏋️', custom: false },
+                { name: '引体向上', icon: '💪', custom: false },
+                { name: '俯卧撑', icon: '💪', custom: false },
+                { name: '深蹲', icon: '🦵', custom: false },
+                // 球类运动
+                { name: '篮球', icon: '🏀', custom: false },
+                { name: '足球', icon: '⚽', custom: false },
+                { name: '羽毛球', icon: '🏸', custom: false },
+                { name: '网球', icon: '🎾', custom: false },
+                { name: '乒乓球', icon: '🏓', custom: false },
+                { name: '排球', icon: '🏐', custom: false },
+                { name: '高尔夫', icon: '⛳', custom: false },
+                { name: '保龄球', icon: '🎳', custom: false },
+                { name: '台球', icon: '🎱', custom: false },
+                // 格斗运动
+                { name: '拳击', icon: '🥊', custom: false },
+                { name: '跆拳道', icon: '🥋', custom: false },
+                { name: '武术', icon: '🥋', custom: false },
+                { name: '柔术', icon: '🤼', custom: false },
+                // 极限运动
+                { name: '滑板', icon: '🛹', custom: false },
+                { name: '冲浪', icon: '🏄', custom: false },
+                { name: '滑雪', icon: '⛷️', custom: false },
+                { name: '攀岩', icon: '🧗', custom: false },
+                { name: '蹦极', icon: '🪂', custom: false },
+                { name: '滑翔伞', icon: '🪂', custom: false },
+                // 户外运动
+                { name: '登山', icon: '⛰️', custom: false },
+                { name: '徒步', icon: '🥾', custom: false },
+                { name: '露营', icon: '⛺', custom: false },
+                { name: '钓鱼', icon: '🎣', custom: false },
+                { name: '骑马', icon: '🏇', custom: false },
+                { name: '射箭', icon: '🏹', custom: false },
+                // 休闲运动
+                { name: '瑜伽', icon: '🧘', custom: false },
+                { name: '普拉提', icon: '🧘', custom: false },
+                { name: '舞蹈', icon: '💃', custom: false },
+                { name: '太极', icon: '☯️', custom: false },
+                { name: '飞盘', icon: '🥏', custom: false },
+                { name: '冰壶', icon: '🥌', custom: false },
+                { name: '门球', icon: '🎯', custom: false },
+                // 水上运动
+                { name: '皮划艇', icon: '🛶', custom: false },
+                { name: '帆船', icon: '⛵', custom: false },
+                { name: '潜水', icon: '🤿', custom: false },
+                { name: '漂流', icon: '🛶', custom: false },
+                // 冰雪运动
+                { name: '滑冰', icon: '⛸️', custom: false },
+                { name: '雪地摩托', icon: '🛷', custom: false },
+                { name: '冰球', icon: '🏒', custom: false },
+                { name: '雪橇', icon: '🛷', custom: false }
+            ],
+            // 好友列表
+            friends: [
+                { id: 1, name: '跑步达人小王', avatar: '🏃', sport: '跑步', days: 128 },
+                { id: 2, name: '骑行爱好者', avatar: '🚴', sport: '骑行', days: 89 },
+                { id: 3, name: '健身教练阿杰', avatar: '🏋️', sport: '健身', days: 256 }
+            ],
+            isLoggedIn: false,
+            loginTime: null
+        };
+        
+        let userData = JSON.parse(JSON.stringify(defaultUserData));
+        
+        let rideState = {
+            active: false, duration: 0, distance: 0,
+            speed: 0, maxSpeed: 0, elevation: 0,
+            cadence: 0, power: 0, heart: 0, interval: null
+        };
+        
+        let currentMode = 'fitness';
+        
+        // ========== 登录/注册 ==========
+        function switchLoginTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            }
+        }
+        
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                Toast('请输入用户名和密码');
+                return;
+            }
+            
+            // 模拟登录
+            const users = JSON.parse(localStorage.getItem('sportplus_users') || '[]');
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                userData.profile = user.profile;
+                userData.settings = user.settings;
+                userData.goals = user.goals;
+                userData.bodyData = user.bodyData;
+                userData.todayFitness = user.todayFitness;
+                userData.rides = user.rides || [];
+                userData.streak = user.streak || 0;
+                userData.weeklyFitness = user.weeklyFitness || [0,0,0,0,0,0,0];
+                userData.invites = user.invites || [];
+                userData.isLoggedIn = true;
+                userData.loginTime = Date.now();
+                saveUserData();
+                showAppMain();
+                Toast('登录成功！');
+            } else {
+                // 如果没有注册过，创建新用户并登录
+                const newUser = {
+                    username: username,
+                    password: password,
+                    profile: { ...defaultUserData.profile, nickname: username },
+                    settings: { ...defaultUserData.settings },
+                    goals: { ...defaultUserData.goals },
+                    bodyData: { ...defaultUserData.bodyData },
+                    todayFitness: { ...defaultUserData.todayFitness },
+                    rides: [],
+                    streak: 0,
+                    weeklyFitness: [0,0,0,0,0,0,0],
+                    invites: []
+                };
+                users.push(newUser);
+                localStorage.setItem('sportplus_users', JSON.stringify(users));
+                
+                userData.profile.nickname = username;
+                userData.isLoggedIn = true;
+                userData.loginTime = Date.now();
+                saveUserData();
+                showAppMain();
+                Toast('登录成功！欢迎 ' + username);
+            }
+        }
+        
+        function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+            
+            if (!username || !phone || !password) {
+                Toast('请填写完整信息');
+                return;
+            }
+            
+            if (password !== password2) {
+                Toast('两次密码输入不一致');
+                return;
+            }
+            
+            if (password.length < 6) {
+                Toast('密码至少6位');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('sportplus_users') || '[]');
+            if (users.find(u => u.username === username)) {
+                Toast('用户名已存在');
+                return;
+            }
+            
+            const newUser = {
+                username: username,
+                phone: phone,
+                password: password,
+                profile: { ...defaultUserData.profile, nickname: username },
+                settings: { ...defaultUserData.settings },
+                goals: { ...defaultUserData.goals },
+                bodyData: { ...defaultUserData.bodyData },
+                todayFitness: { ...defaultUserData.todayFitness },
+                rides: [],
+                streak: 0,
+                weeklyFitness: [0,0,0,0,0,0,0],
+                invites: []
+            };
+            users.push(newUser);
+            localStorage.setItem('sportplus_users', JSON.stringify(users));
+            
+            userData.profile.nickname = username;
+            userData.isLoggedIn = true;
+            userData.loginTime = Date.now();
+            saveUserData();
+            showAppMain();
+            Toast('注册成功！');
+        }
+        
+        function socialLogin(type) {
+            Toast('正在连接' + (type === 'wechat' ? '微信' : type === 'qq' ? 'QQ' : '微博') + '...');
+            setTimeout(() => {
+                const names = { wechat: '微信用户', qq: 'QQ用户', weibo: '微博用户' };
+                userData.profile.nickname = names[type] + Math.floor(Math.random() * 1000);
+                userData.profile.avatar = ['🚴', '🏃', '🏋️', '🧘'][Math.floor(Math.random() * 4)];
+                userData.isLoggedIn = true;
+                userData.loginTime = Date.now();
+                saveUserData();
+                showAppMain();
+                Toast('登录成功！');
+            }, 1000);
+        }
+        
+        function showAppMain() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appMain').style.display = 'flex';
+            init();
+        }
+        
+        // ========== 初始化 ==========
+        function init() {
+            loadUserData();
+            updateAllDisplays();
+            renderInviteList();
+            renderFriendList();
+            renderHomeSportTypes();
+        }
+        
+        function saveUserData() {
+            localStorage.setItem('sportplus_v2', JSON.stringify(userData));
+        }
+        
+        function loadUserData() {
+            const saved = localStorage.getItem('sportplus_v2');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    userData = { 
+                        ...JSON.parse(JSON.stringify(defaultUserData)),
+                        ...parsed,
+                        profile: { ...defaultUserData.profile, ...parsed.profile },
+                        settings: { ...defaultUserData.settings, ...parsed.settings },
+                        goals: { ...defaultUserData.goals, ...parsed.goals },
+                        bodyData: { ...defaultUserData.bodyData, ...parsed.bodyData },
+                        todayFitness: { ...defaultUserData.todayFitness, ...parsed.todayFitness },
+                        sportTypes: parsed.sportTypes || defaultUserData.sportTypes,
+                        friends: parsed.friends || defaultUserData.friends
+                    };
+                } catch(e) {
+                    userData = JSON.parse(JSON.stringify(defaultUserData));
+                }
+            } else {
+                userData = JSON.parse(JSON.stringify(defaultUserData));
+            }
+        }
+        
+        // ========== 页面切换 ==========
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + page).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget?.classList.add('active');
+            
+            updateAllDisplays();
+        }
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            event.currentTarget.classList.add('active');
+            event.currentTarget.parentElement.querySelector('.mode-tab.active')?.classList.remove('active');
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('fitnessPanel').style.display = mode === 'fitness' ? 'block' : 'none';
+            document.getElementById('cyclingPanel').style.display = mode === 'cycling' ? 'block' : 'none';
+        }
+        
+        // ========== 更新显示 ==========
+        function updateAllDisplays() {
+            updateProfileDisplay();
+            updateFitnessDisplay();
+            updateCyclingDisplay();
+            updateStatsDisplay();
+            updateProfileStats();
+            renderHomeSportTypes();
+        }
+        
+        function updateProfileDisplay() {
+            const p = userData.profile;
+            const isImg = p.avatar?.startsWith('data:image');
+            const html = isImg ? `<img src="${p.avatar}">` : p.avatar;
+            
+            document.getElementById('headerAvatar').innerHTML = html;
+            document.getElementById('headerNickname').textContent = p.nickname;
+            document.getElementById('headerSignature').textContent = p.signature;
+            document.getElementById('profileAvatar').innerHTML = html;
+            document.getElementById('profileNickname').textContent = p.nickname;
+            document.getElementById('profileSignature').textContent = p.signature;
+            document.getElementById('myRankAvatar').innerHTML = html;
+            document.getElementById('myRankName').textContent = p.nickname;
+            
+            document.getElementById('streakCount').textContent = userData.streak;
+        }
+        
+        function updateFitnessDisplay() {
+            const t = userData.todayFitness;
+            const g = userData.goals;
+            
+            document.getElementById('stepCount').textContent = t.steps.toLocaleString();
+            document.getElementById('stepGoal').textContent = g.steps.toLocaleString();
+            document.getElementById('stepsVal').textContent = t.steps;
+            document.getElementById('calVal').textContent = t.calories;
+            document.getElementById('timeVal').textContent = t.exerciseTime + 'm';
+            document.getElementById('heartVal').textContent = t.heartRate;
+            document.getElementById('distVal').textContent = t.distance + ' km';
+            document.getElementById('intensityVal').textContent = t.intensity || '低';
+            document.getElementById('paceVal').textContent = t.pace || "0'00\"";
+            
+            const pct = g.steps > 0 ? Math.min(100, t.steps / g.steps * 100) : 0;
+            const offset = 565 - (565 * pct / 100 * 0.75);
+            document.getElementById('stepProgress').style.strokeDashoffset = offset;
+        }
+        
+        function updateCyclingDisplay() {
+            const totalDist = userData.rides.reduce((s, r) => s + (r.distance || 0), 0).toFixed(1);
+            const totalTime = userData.rides.reduce((s, r) => s + (r.duration || 0), 0);
+            const totalElev = userData.rides.reduce((s, r) => s + (r.elevation || 0), 0);
+            const maxSpd = Math.max(...userData.rides.map(r => r.maxSpeed || 0), 0);
+            
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            const weekDist = userData.rides
+                .filter(r => new Date(r.date) >= startOfWeek)
+                .reduce((s, r) => s + (r.distance || 0), 0)
+                .toFixed(1);
+            
+            document.getElementById('weekRideDist').textContent = weekDist;
+            document.getElementById('rideGoal').textContent = userData.goals.weeklyRides;
+            document.getElementById('totalDist').textContent = totalDist;
+            document.getElementById('totalTime').textContent = Math.floor(totalTime / 60) + 'h';
+            document.getElementById('avgSpeed').textContent = totalTime > 0 ? (totalDist / (totalTime / 60)).toFixed(1) : '0';
+            document.getElementById('maxSpeed').textContent = maxSpd.toFixed(1);
+            document.getElementById('totalElev').textContent = totalElev + ' m';
+            document.getElementById('avgCadence').textContent = '0';
+            document.getElementById('avgPower').textContent = userData.bodyData.ftp + 'W';
+            
+            const pct = userData.goals.weeklyRides > 0 ? Math.min(100, weekDist / userData.goals.weeklyRides * 100) : 0;
+            const offset = 565 - (565 * pct / 100 * 0.75);
+            document.getElementById('rideProgress').style.strokeDashoffset = offset;
+        }
+        
+        function updateStatsDisplay() {
+            const w = userData.weeklyFitness;
+            const maxW = Math.max(...w, 1);
+            
+            document.getElementById('statSteps').textContent = w.reduce((s, v) => s + v, 0);
+            document.getElementById('statCal').textContent = Math.round(w.reduce((s, v) => s + v, 0) / 20);
+            document.getElementById('statTime').textContent = (w.reduce((s, v) => s + v, 0) / 1000 * 0.6).toFixed(1) + 'h';
+            document.getElementById('statDays').textContent = w.filter(v => v > 0).length;
+            
+            const bars = document.querySelectorAll('#fitnessChart .chart-bar');
+            bars.forEach((bar, i) => {
+                const h = maxW > 0 ? (w[i] / maxW * 100) : 0;
+                bar.style.height = Math.max(4, h) + '%';
+            });
+            
+            updateHistoryList();
+        }
+        
+        function updateHistoryList() {
+            let html = '';
+            
+            if (userData.todayFitness.steps > 0) {
+                html += `
+                    <div class="history-item">
+                        <div class="history-icon run">🏃</div>
+                        <div class="history-details">
+                            <h4>今日运动</h4>
+                            <p>${new Date().toISOString().slice(0,10)} · 健身</p>
+                        </div>
+                        <div class="history-stats">
+                            <div class="main">${userData.todayFitness.steps} 步</div>
+                            <div class="sub">${userData.todayFitness.calories} 卡 · ${userData.todayFitness.exerciseTime}m</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            userData.rides.slice(0, 5).forEach(r => {
+                html += `
+                    <div class="history-item">
+                        <div class="history-icon ride">🚴</div>
+                        <div class="history-details">
+                            <h4>骑行记录</h4>
+                            <p>${r.date} · 骑行</p>
+                        </div>
+                        <div class="history-stats">
+                            <div class="main">${r.distance} km</div>
+                            <div class="sub">${Math.floor(r.duration/60)}h ${r.duration%60}m · 均速${r.avgSpeed}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (!html) html = '<p style="text-align:center;color:#94A3B8;padding:20px;">暂无记录</p>';
+            document.getElementById('historyList').innerHTML = html;
+            
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            const weekDist = userData.rides
+                .filter(r => new Date(r.date) >= startOfWeek)
+                .reduce((s, r) => s + (r.distance || 0), 0)
+                .toFixed(1);
+            document.getElementById('myRankValue').textContent = weekDist + 'km';
+        }
+        
+        function updateProfileStats() {
+            document.getElementById('profileWorkouts').textContent = userData.rides.length;
+            document.getElementById('profileDays').textContent = userData.streak;
+            const totalCal = userData.todayFitness.calories + userData.rides.reduce((s, r) => s + (r.kcal || 0), 0);
+            document.getElementById('profileCal').textContent = totalCal;
+            
+            document.getElementById('goalSteps').value = userData.goals.steps;
+            document.getElementById('goalCal').value = userData.goals.calories;
+            document.getElementById('goalRides').value = userData.goals.weeklyRides;
+            
+            document.getElementById('bodyWeight').textContent = userData.bodyData.weight;
+            document.getElementById('bodyHeight').textContent = userData.bodyData.height;
+            document.getElementById('bodyFTP').textContent = userData.bodyData.ftp;
+            document.getElementById('bodyWkg').textContent = (userData.bodyData.ftp / userData.bodyData.weight).toFixed(1) + ' W/kg';
+        }
+        
+        // ========== 骑行功能 ==========
+        function toggleRide() {
+            if (rideState.active) pauseRide();
+            else startRide();
+        }
+        
+        function startRide() {
+            rideState = { active: true, duration: 0, distance: 0, speed: 0, maxSpeed: 0, elevation: 0, cadence: 0, power: 0, heart: 0, interval: null };
+            
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('playBtn').className = 'ride-btn pause';
+            document.getElementById('rideTip').textContent = '🚴 骑行中... 点击暂停';
+            
+            rideState.interval = setInterval(() => {
+                rideState.duration++;
+                const baseSpeed = 20 + Math.random() * 15;
+                rideState.speed = Math.floor(baseSpeed * 10) / 10;
+                if (rideState.speed > rideState.maxSpeed) rideState.maxSpeed = rideState.speed;
+                rideState.distance += rideState.speed / 3.6;
+                if (Math.random() > 0.85) rideState.elevation += Math.random() * 3;
+                rideState.cadence = Math.floor(75 + Math.random() * 20);
+                rideState.power = Math.floor(userData.bodyData.ftp * (0.5 + Math.random() * 0.5));
+                rideState.heart = Math.floor(120 + Math.random() * 40);
+                
+                updateRideDisplay();
+            }, 1000);
+            
+            Toast('骑行开始！');
+        }
+        
+        function pauseRide() {
+            rideState.active = false;
+            if (rideState.interval) clearInterval(rideState.interval);
+            
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+            document.getElementById('playBtn').className = 'ride-btn play';
+            document.getElementById('rideTip').textContent = '⏸️ 已暂停';
+        }
+        
+        function updateRideDisplay() {
+            const h = Math.floor(rideState.duration / 3600);
+            const m = Math.floor((rideState.duration % 3600) / 60);
+            const s = rideState.duration % 60;
+            document.getElementById('rideTimer').textContent = 
+                `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            document.getElementById('rideDistance').textContent = (rideState.distance / 1000).toFixed(2);
+            document.getElementById('liveSpeed').textContent = rideState.speed.toFixed(1);
+            document.getElementById('liveMaxSpeed').textContent = rideState.maxSpeed.toFixed(1);
+            document.getElementById('liveElev').textContent = Math.floor(rideState.elevation);
+            document.getElementById('liveCadence').textContent = rideState.cadence;
+            document.getElementById('livePower').textContent = rideState.power;
+            document.getElementById('liveHeart').textContent = rideState.heart;
+        }
+        
+        function finishRide() {
+            if (rideState.duration < 5) { Toast('骑行时间太短'); return; }
+            const dist = parseFloat((rideState.distance / 1000).toFixed(1));
+            if (dist < 0.1) { Toast('距离太短未记录'); return; }
+            
+            const newRide = {
+                id: Date.now().toString(),
+                date: new Date().toISOString().slice(0,10),
+                distance: dist,
+                duration: Math.floor(rideState.duration / 60),
+                avgSpeed: parseFloat((dist / (rideState.duration / 3600)).toFixed(1)),
+                maxSpeed: parseFloat(rideState.maxSpeed.toFixed(1)),
+                elevation: Math.floor(rideState.elevation),
+                cadence: rideState.cadence,
+                power: rideState.power,
+                kcal: Math.floor(rideState.duration / 60 * 8)
+            };
+            
+            userData.rides.unshift(newRide);
+            saveUserData();
+            pauseRide();
+            Toast('骑行已保存: ' + dist + 'km');
+            
+            ['rideTimer','rideDistance','liveSpeed','liveMaxSpeed','liveElev','liveCadence','livePower','liveHeart'].forEach(id => {
+                document.getElementById(id).textContent = id === 'rideDistance' ? '0.00' : '0';
+            });
+            document.getElementById('rideTimer').textContent = '00:00:00';
+            
+            rideState = { active: false, duration: 0, distance: 0, speed: 0, maxSpeed: 0, elevation: 0, cadence: 0, power: 0, heart: 0, interval: null };
+            switchPage('Home');
+        }
+        
+        // ========== 邀约功能 ==========
+        function renderInviteList() {
+            const list = document.getElementById('inviteList');
+            if (!list) return;
+            
+            if (userData.invites.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:20px;">暂无邀约，快发起一个吧！</p>';
+                return;
+            }
+            
+            let html = '';
+            userData.invites.forEach((invite, idx) => {
+                const typeClass = invite.type === '骑行' ? 'cycling' : '';
+                const statusBtn = invite.status === 'pending' 
+                    ? `<button class="invite-btn decline" onclick="declineInvite(${idx})">拒绝</button>
+                       <button class="invite-btn accept" onclick="acceptInvite(${idx})">接受</button>`
+                    : invite.status === 'accepted'
+                    ? `<button class="invite-btn joined" onclick="Toast('已加入活动')">已接受</button>`
+                    : `<button class="invite-btn decline">已拒绝</button>`;
+                
+                html += `
+                    <div class="invite-card">
+                        <div class="invite-header">
+                            <div class="invite-avatar">${invite.avatar}</div>
+                            <div class="invite-info">
+                                <h4>${invite.from}</h4>
+                                <p>${invite.time}</p>
+                            </div>
+                        </div>
+                        <div class="invite-content">
+                            <span class="invite-type ${typeClass}">${invite.type}</span>
+                            <div class="invite-detail">
+                                <p>📍 ${invite.location}</p>
+                                <p>⏰ ${invite.datetime}</p>
+                            </div>
+                        </div>
+                        <div class="invite-actions">
+                            ${statusBtn}
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+        
+        function showCreateInviteModal() {
+            // 生成运动类型网格（默认只显示常用类型）
+            const allTypes = userData.sportTypes;
+            // 常用运动（优先显示的）
+            const popularSports = ['跑步', '骑行', '健身', '游泳', '瑜伽', '篮球', '足球', '羽毛球', '乒乓球', '登山', '滑雪', '徒步'];
+            
+            // 分离常用和全部
+            const popularTypes = allTypes.filter(s => popularSports.includes(s.name));
+            const otherTypes = allTypes.filter(s => !popularSports.includes(s.name));
+            
+            let typeGrid = popularTypes.map(s => 
+                `<div class="sport-type-grid-item" onclick="selectSportType('${s.name}', '${s.icon}', this)">
+                    <span class="sport-icon">${s.icon}</span>
+                    <span class="sport-name">${s.name}</span>
+                </div>`
+            ).join('');
+            
+            let hiddenTypes = otherTypes.map(s => 
+                `<div class="sport-type-grid-item" onclick="selectSportType('${s.name}', '${s.icon}', this)" style="display:none;">
+                    <span class="sport-icon">${s.icon}</span>
+                    <span class="sport-name">${s.name}</span>
+                </div>`
+            ).join('');
+            
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">创建运动邀约</h3>
+                <input type="hidden" id="inviteType" value="跑步">
+                <div style="margin-bottom:8px;">
+                    <p style="font-size:13px;color:#64748B;margin-bottom:8px;">选择运动类型</p>
+                    <div class="sport-type-grid" id="sportTypeGrid">
+                        ${typeGrid}
+                        ${hiddenTypes}
+                    </div>
+                    <button onclick="toggleMoreSports(this)" id="toggleMoreBtn" style="width:100%;margin-top:8px;background:#EEF2FF;color:#6366F1;border:none;border-radius:12px;padding:10px;cursor:pointer;font-weight:500;">
+                        <i class="fas fa-chevron-down"></i> 查看更多运动类型
+                    </button>
+                    <button onclick="showAddSportTypeModal()" style="width:100%;margin-top:8px;background:#F1F5F9;color:#6366F1;border:1px dashed #6366F1;border-radius:12px;padding:10px;cursor:pointer;">
+                        <i class="fas fa-plus"></i> 添加自定义运动
+                    </button>
+                </div>
+                <input type="text" class="input-field" id="inviteLocation" placeholder="运动地点（如：滨江公园）">
+                <input type="datetime-local" class="input-field" id="inviteDateTime">
+                <textarea class="input-field" id="inviteNote" placeholder="备注信息（可选）" rows="2" style="resize:none;"></textarea>
+                <button class="login-btn" onclick="createInvite()">发布邀约</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+            // 默认选中第一个
+            setTimeout(() => {
+                const firstItem = document.querySelector('.sport-type-grid-item');
+                if (firstItem) firstItem.click();
+            }, 100);
+        }
+        
+        let isShowingAll = false;
+        function toggleMoreSports(btn) {
+            const hiddenItems = document.querySelectorAll('#sportTypeGrid .sport-type-grid-item[style="display:none;"]');
+            const grid = document.getElementById('sportTypeGrid');
+            
+            if (!isShowingAll) {
+                // 显示全部
+                hiddenItems.forEach(item => item.style.display = 'flex');
+                grid.style.maxHeight = '400px';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起更多';
+                btn.style.background = '#F1F5F9';
+                isShowingAll = true;
+            } else {
+                // 收起
+                const allItems = grid.querySelectorAll('.sport-type-grid-item');
+                const popularCount = 12;
+                allItems.forEach((item, i) => {
+                    if (i >= popularCount) item.style.display = 'none';
+                });
+                grid.style.maxHeight = '250px';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> 查看更多运动类型';
+                btn.style.background = '#EEF2FF';
+                isShowingAll = false;
+            }
+        }
+        
+        function selectSportType(name, icon, el) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.sport-type-grid-item').forEach(item => {
+                item.style.background = '#F8FAFC';
+                item.style.border = '1px solid #E2E8F0';
+            });
+            // 添加选中状态
+            el.style.background = '#EEF2FF';
+            el.style.border = '2px solid #6366F1';
+            // 存储选中的值
+            document.getElementById('inviteType').value = name;
+        }
+        
+        function showAddSportTypeModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">添加自定义运动</h3>
+                <input type="text" class="input-field" id="newSportName" placeholder="运动名称（如：滑板）">
+                <input type="text" class="input-field" id="newSportIcon" placeholder="图标（输入emoji，如：🛹）">
+                <p style="font-size:12px;color:#94A3B8;margin:8px 0 16px;">常用图标：🛹滑板 | ⛳高尔夫 | 🥏飞盘 | 🤸体操 | 🏌️保龄球</p>
+                <button class="login-btn" onclick="addCustomSport()">添加</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        function addCustomSport() {
+            const name = document.getElementById('newSportName').value.trim();
+            const icon = document.getElementById('newSportIcon').value.trim() || '🏃';
+            
+            if (!name) {
+                Toast('请输入运动名称');
+                return;
+            }
+            
+            // 检查是否已存在
+            if (userData.sportTypes.some(s => s.name === name)) {
+                Toast('该运动类型已存在');
+                return;
+            }
+            
+            userData.sportTypes.push({ name, icon, custom: true });
+            saveUserData();
+            closeModal();
+            Toast('已添加 ' + icon + ' ' + name);
+            
+            // 重新打开邀约弹窗
+            setTimeout(() => showCreateInviteModal(), 300);
+        }
+        
+        function createInvite() {
+            const type = document.getElementById('inviteType').value;
+            const location = document.getElementById('inviteLocation').value;
+            const datetime = document.getElementById('inviteDateTime').value;
+            const note = document.getElementById('inviteNote').value;
+            
+            if (!location || !datetime) {
+                Toast('请填写完整信息');
+                return;
+            }
+            
+            const invite = {
+                id: Date.now(),
+                from: userData.profile.nickname,
+                avatar: userData.profile.avatar,
+                type: type,
+                location: location,
+                datetime: datetime,
+                note: note,
+                status: 'pending',
+                time: '刚刚'
+            };
+            
+            userData.invites.unshift(invite);
+            saveUserData();
+            renderInviteList();
+            closeModal();
+            Toast('邀约已发布！');
+        }
+        
+        function inviteFriend(name, friendId) {
+            const allTypes = userData.sportTypes;
+            const popularSports = ['跑步', '骑行', '健身', '游泳', '瑜伽', '篮球', '足球', '羽毛球', '乒乓球', '登山', '滑雪', '徒步'];
+            
+            const popularTypes = allTypes.filter(s => popularSports.includes(s.name));
+            const otherTypes = allTypes.filter(s => !popularSports.includes(s.name));
+            
+            let typeGrid = popularTypes.map(s => 
+                `<div class="sport-type-grid-item" onclick="selectFriendSportType('${s.name}', this)">
+                    <span class="sport-icon">${s.icon}</span>
+                    <span class="sport-name">${s.name}</span>
+                </div>`
+            ).join('');
+            
+            let hiddenTypes = otherTypes.map(s => 
+                `<div class="sport-type-grid-item" onclick="selectFriendSportType('${s.name}', this)" style="display:none;">
+                    <span class="sport-icon">${s.icon}</span>
+                    <span class="sport-name">${s.name}</span>
+                </div>`
+            ).join('');
+            
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">向 ${name} 发起邀约</h3>
+                <input type="hidden" id="inviteFriendType" value="跑步">
+                <div style="margin-bottom:8px;">
+                    <p style="font-size:13px;color:#64748B;margin-bottom:8px;">选择运动类型</p>
+                    <div class="sport-type-grid" id="friendSportTypeGrid">
+                        ${typeGrid}
+                        ${hiddenTypes}
+                    </div>
+                    <button onclick="toggleFriendMoreSports(this)" style="width:100%;margin-top:8px;background:#EEF2FF;color:#6366F1;border:none;border-radius:12px;padding:10px;cursor:pointer;font-weight:500;">
+                        <i class="fas fa-chevron-down"></i> 查看更多运动类型
+                    </button>
+                </div>
+                <input type="text" class="input-field" id="inviteFriendLocation" placeholder="运动地点（如：滨江公园）">
+                <input type="datetime-local" class="input-field" id="inviteFriendDateTime">
+                <textarea class="input-field" id="inviteFriendNote" placeholder="备注信息（可选）" rows="2" style="resize:none;"></textarea>
+                <button class="login-btn" onclick="sendFriendInvite('${name}', ${friendId})">发送邀约</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+            // 默认选中第一个
+            setTimeout(() => {
+                const firstItem = document.querySelector('#friendSportTypeGrid .sport-type-grid-item');
+                if (firstItem) firstItem.click();
+            }, 100);
+        }
+        
+        function toggleFriendMoreSports(btn) {
+            const hiddenItems = document.querySelectorAll('#friendSportTypeGrid .sport-type-grid-item[style="display:none;"]');
+            const grid = document.getElementById('friendSportTypeGrid');
+            
+            if (btn.innerHTML.includes('查看更多')) {
+                hiddenItems.forEach(item => item.style.display = 'flex');
+                grid.style.maxHeight = '400px';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起更多';
+                btn.style.background = '#F1F5F9';
+            } else {
+                const allItems = grid.querySelectorAll('.sport-type-grid-item');
+                allItems.forEach((item, i) => {
+                    if (i >= 12) item.style.display = 'none';
+                });
+                grid.style.maxHeight = '250px';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> 查看更多运动类型';
+                btn.style.background = '#EEF2FF';
+            }
+        }
+        
+        function selectFriendSportType(name, el) {
+            document.querySelectorAll('#friendSportTypeGrid .sport-type-grid-item').forEach(item => {
+                item.style.background = '#F8FAFC';
+                item.style.border = '1px solid #E2E8F0';
+            });
+            el.style.background = '#EEF2FF';
+            el.style.border = '2px solid #6366F1';
+            document.getElementById('inviteFriendType').value = name;
+        }
+        
+        function sendFriendInvite(name, friendId) {
+            const type = document.getElementById('inviteFriendType').value;
+            const location = document.getElementById('inviteFriendLocation').value;
+            const datetime = document.getElementById('inviteFriendDateTime').value;
+            const note = document.getElementById('inviteFriendNote').value;
+            
+            if (!location || !datetime) {
+                Toast('请填写完整信息');
+                return;
+            }
+            
+            const invite = {
+                id: Date.now(),
+                from: userData.profile.nickname,
+                avatar: userData.profile.avatar,
+                to: name,
+                toId: friendId,
+                type: type,
+                location: location,
+                datetime: datetime,
+                note: note,
+                status: 'pending',
+                time: '刚刚'
+            };
+            
+            userData.invites.unshift(invite);
+            saveUserData();
+            renderInviteList();
+            closeModal();
+            Toast('已向 ' + name + ' 发送邀约！');
+        }
+        
+        // 扫码加入
+        function showQRCodeModal() {
+            const userCode = btoa(userData.profile.nickname + '_' + Date.now()).substring(0, 16);
+            
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">扫码加入</h3>
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="width:200px;height:200px;background:#fff;margin:0 auto;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:120px;">
+                        📱
+                    </div>
+                    <p style="margin-top:12px;color:#94A3B8;font-size:13px;">请使用另一台设备扫码</p>
+                </div>
+                <div style="background:#F1F5F9;padding:12px;border-radius:12px;text-align:center;margin-bottom:16px;">
+                    <p style="font-size:12px;color:#64748B;margin-bottom:4px;">我的邀请码</p>
+                    <p style="font-size:18px;font-weight:bold;color:#6366F1;letter-spacing:2px;">${userCode}</p>
+                </div>
+                <button class="login-btn" onclick="showScanQRModal()">扫一扫加入</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">关闭</button>
+            `);
+        }
+        
+        function showScanQRModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">扫描二维码</h3>
+                <div style="text-align:center;">
+                    <div style="width:200px;height:200px;background:#fff;margin:0 auto;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:80px;">
+                        📷
+                    </div>
+                    <p style="margin-top:12px;color:#64748B;font-size:13px;">将二维码放入框内</p>
+                </div>
+                <input type="text" class="input-field" id="scanCodeInput" placeholder="或输入邀请码" style="margin-top:16px;">
+                <button class="login-btn" onclick="processScanCode()">确认加入</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        function processScanCode() {
+            const code = document.getElementById('scanCodeInput').value.trim();
+            if (!code) {
+                Toast('请输入邀请码');
+                return;
+            }
+            closeModal();
+            Toast('已成功加入好友！');
+        }
+        
+        // 分享链接
+        function showShareLinkModal() {
+            const shareCode = btoa(userData.profile.nickname + '_sportplus').replace(/[^a-zA-Z0-9]/g, '').substring(0, 12);
+            const shareLink = `sportplus://invite/${shareCode}`;
+            
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">分享邀请链接</h3>
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="background:#6366F1;color:#fff;padding:20px;border-radius:16px;">
+                        <p style="font-size:14px;margin-bottom:8px;">邀请好友一起运动</p>
+                        <p style="font-size:18px;font-weight:bold;">${userData.profile.nickname}</p>
+                        <p style="font-size:24px;margin-top:8px;">${userData.profile.avatar}</p>
+                    </div>
+                </div>
+                <div style="background:#F1F5F9;padding:12px;border-radius:12px;margin-bottom:16px;">
+                    <p style="font-size:12px;color:#64748B;margin-bottom:4px;">邀请链接</p>
+                    <p style="font-size:12px;word-break:break-all;color:#374151;" id="shareLinkText">${shareLink}</p>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="login-btn" style="flex:1;" onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i> 复制链接
+                    </button>
+                    <button class="login-btn" style="flex:1;background:#07C160;" onclick="shareToWechat()">
+                        <i class="fab fa-weixin"></i> 微信
+                    </button>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button class="login-btn" style="flex:1;background:#12B7F5;" onclick="shareToQQ()">
+                        <i class="fab fa-qq"></i> QQ
+                    </button>
+                    <button class="login-btn" style="flex:1;background:#FD9720;" onclick="shareToWeibo()">
+                        <i class="fab fa-weibo"></i> 微博
+                    </button>
+                </div>
+                <button class="w-full py-3 text-gray-500 mt-4" onclick="closeModal()">关闭</button>
+            `);
+        }
+        
+        function copyShareLink() {
+            const link = document.getElementById('shareLinkText').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                Toast('链接已复制到剪贴板！');
+            }).catch(() => {
+                Toast('复制成功！');
+            });
+        }
+        
+        function shareToWechat() {
+            Toast('请长按复制链接分享到微信');
+        }
+        
+        function shareToQQ() {
+            const link = document.getElementById('shareLinkText').textContent;
+            window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(link)}&title=运动+邀约&desc=一起运动吧！`);
+        }
+        
+        function shareToWeibo() {
+            const link = document.getElementById('shareLinkText').textContent;
+            window.open(`https://service.weibo.com/share/share.php?url=${encodeURIComponent(link)}&title=一起运动吧！`);
+        }
+        
+        // 添加好友
+        function showAddFriendModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">添加好友</h3>
+                <input type="text" class="input-field" id="addFriendName" placeholder="输入好友昵称">
+                <input type="text" class="input-field" id="addFriendSport" placeholder="擅长运动（如：跑步）">
+                <button class="login-btn" onclick="addNewFriend()">添加</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        function addNewFriend() {
+            const name = document.getElementById('addFriendName').value.trim();
+            const sport = document.getElementById('addFriendSport').value.trim() || '运动';
+            
+            if (!name) {
+                Toast('请输入好友昵称');
+                return;
+            }
+            
+            if (userData.friends.some(f => f.name === name)) {
+                Toast('该好友已存在');
+                return;
+            }
+            
+            const icons = ['🏃', '🚴', '🏋️', '🏊', '🧘', '⚽', '🏀'];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            
+            userData.friends.push({
+                id: Date.now(),
+                name: name,
+                avatar: randomIcon,
+                sport: sport,
+                days: 0
+            });
+            
+            saveUserData();
+            renderFriendList();
+            closeModal();
+            Toast('已添加好友 ' + name);
+        }
+        
+        function removeFriend(friendId) {
+            if (confirm('确定要删除该好友吗？')) {
+                userData.friends = userData.friends.filter(f => f.id !== friendId);
+                saveUserData();
+                renderFriendList();
+                Toast('已删除好友');
+            }
+        }
+        
+        function renderFriendList() {
+            const container = document.getElementById('friendList');
+            if (!container) return;
+            
+            if (userData.friends.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:20px;">暂无好友，快去添加吧！</p>';
+                return;
+            }
+            
+            container.innerHTML = userData.friends.map(f => `
+                <div class="friend-item">
+                    <div class="friend-avatar">${f.avatar}</div>
+                    <div class="friend-info">
+                        <h4>${f.name}</h4>
+                        <p>${f.sport} · 已运动${f.days}天</p>
+                    </div>
+                    <div style="display:flex;gap:4px;">
+                        <button class="friend-action" onclick="inviteFriend('${f.name}', ${f.id})">邀约</button>
+                        <button onclick="removeFriend(${f.id})" style="background:#FEE2E2;color:#EF4444;border:none;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function acceptInvite(idx) {
+            userData.invites[idx].status = 'accepted';
+            saveUserData();
+            renderInviteList();
+            Toast('已接受邀约！');
+        }
+        
+        function declineInvite(idx) {
+            userData.invites[idx].status = 'declined';
+            saveUserData();
+            renderInviteList();
+            Toast('已拒绝邀约');
+        }
+        
+        // ========== 弹窗 ==========
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = '<div class="modal-handle"></div>' + content;
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+        
+        function closeModal(e) {
+            if (!e || e.target.id === 'modalOverlay') {
+                document.getElementById('modalOverlay').classList.remove('show');
+            }
+        }
+        
+        function Toast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2000);
+        }
+        
+        function showSaveIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.opacity = '1';
+                el.innerHTML = '<i class="fas fa-check-circle" style="color:#10B981;"></i> 已保存';
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                }, 1500);
+            }
+        }
+        
+        function showDetail(type) {
+            const t = userData.todayFitness;
+            const g = userData.goals;
+            const titles = {
+                steps: '步数详情', cal: '卡路里', time: '运动时长', heart: '心率',
+                distance: '距离', intensity: '运动强度', pace: '配速'
+            };
+            const texts = {
+                steps: `今日 ${t.steps} 步，目标 ${g.steps} 步`,
+                cal: `今日消耗 ${t.calories} 卡路里`,
+                time: `今日运动 ${t.exerciseTime} 分钟`,
+                heart: `当前心率 ${t.heartRate} bpm`,
+                distance: `今日运动距离 ${t.distance} 公里`,
+                intensity: `今日运动强度：${t.intensity || '低'}`,
+                pace: `平均配速：${t.pace || "0'00\""}`
+            };
+            
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-2">${titles[type]}</h3>
+                <p class="text-gray-600 text-center mb-6">${texts[type]}</p>
+                <button class="login-btn" onclick="closeModal()">确定</button>
+            `);
+        }
+        
+        function showWorkoutModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">记录运动</h3>
+                <input type="number" class="input-field" id="wSteps" placeholder="步数" value="0">
+                <input type="number" class="input-field" id="wCal" placeholder="卡路里" value="0">
+                <input type="number" class="input-field" id="wTime" placeholder="运动时长(分钟)" value="0">
+                <input type="number" class="input-field" id="wHeart" placeholder="心率(bpm)" value="0">
+                <input type="number" class="input-field" id="wDist" placeholder="距离(km)" step="0.1" value="0">
+                <input type="number" class="input-field" id="wElev" placeholder="爬升(m)" value="0">
+                <button class="login-btn" onclick="saveWorkout()">保存</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        function saveWorkout() {
+            userData.todayFitness.steps = parseInt(document.getElementById('wSteps').value) || 0;
+            userData.todayFitness.calories = parseInt(document.getElementById('wCal').value) || 0;
+            userData.todayFitness.exerciseTime = parseInt(document.getElementById('wTime').value) || 0;
+            userData.todayFitness.heartRate = parseInt(document.getElementById('wHeart').value) || 0;
+            userData.todayFitness.distance = parseFloat(document.getElementById('wDist').value) || 0;
+            
+            saveUserData();
+            updateFitnessDisplay();
+            updateStatsDisplay();
+            closeModal();
+            Toast('运动数据已保存 ✓');
+        }
+        
+        function startWorkout(type) {
+            const types = { run: '跑步', walk: '走路', gym: '健身', swim: '游泳', yoga: '瑜伽', bike: '骑行' };
+            Toast('开始记录: ' + (types[type] || '运动'));
+            showWorkoutModal();
+        }
+        
+        // 首页运动类型网格背景色
+        const sportBgColors = {
+            '跑步': '#EEF2FF', '快走': '#F0FDF4', '骑行': '#FFF7ED', '游泳': '#E0F2FE',
+            '跳绳': '#FEF3C7', '椭圆机': '#F3E8FF', '划船机': '#ECFDF5', '动感单车': '#FEF2F2',
+            '健身': '#FEF3C7', '力量训练': '#F3E8FF', ' CrossFit': '#FEF2F2', ' HIIT': '#ECFDF5',
+            '普拉提': '#FCE7F3', '瑜伽': '#FCE7F3', '拉伸': '#F0FDF4', '篮球': '#DBEAFE',
+            '足球': '#F0FDF4', '羽毛球': '#EEF2FF', '乒乓球': '#FEF3C7', '网球': '#FCE7F3',
+            '排球': '#DBEAFE', '棒球': '#FEF2F2', '高尔夫': '#F0FDF4', '台球': '#F3E8FF',
+            '拳击': '#FEF2F2', '跆拳道': '#EEF2FF', '柔道': '#F0FDF4', '摔跤': '#FEF3C7',
+            '击剑': '#E0F2FE', '滑板': '#FCE7F3', '轮滑': '#DBEAFE', '攀岩': '#FEF2F2',
+            'BMX': '#FFF7ED', '跑酷': '#ECFDF5', '登山': '#F0FDF4', '徒步': '#EEF2FF',
+            '露营': '#FEF3C7', '钓鱼': '#E0F2FE', '定向越野': '#F3E8FF', '射箭': '#FCE7F3',
+            '飞盘': '#DBEAFE', '保龄球': '#FEF2F2', '壁球': '#EEF2FF', '舞蹈': '#FCE7F3',
+            '冲浪': '#E0F2FE', '潜水': '#DBEAFE', '帆船': '#EEF2FF', '皮划艇': '#F0FDF4',
+            '水上摩托': '#FFF7ED', '滑雪': '#E0F2FE', '单板滑雪': '#DBEAFE', '滑冰': '#EEF2FF',
+            '冰球': '#F0FDF4'
+        };
+        
+        // 运动分类映射
+        const sportCategories = {
+            '跑步': 'aerobic', '快走': 'aerobic', '骑行': 'aerobic', '游泳': 'aerobic',
+            '跳绳': 'aerobic', '椭圆机': 'aerobic', '划船机': 'aerobic', '动感单车': 'aerobic',
+            '有氧操': 'aerobic', '跑步机': 'aerobic', ' HIIT': 'aerobic',
+            '健身': 'strength', '举重': 'strength', '引体向上': 'strength', '俯卧撑': 'strength',
+            '深蹲': 'strength', '力量训练': 'strength', ' CrossFit': 'strength',
+            '篮球': 'ball', '足球': 'ball', '羽毛球': 'ball', '网球': 'ball',
+            '乒乓球': 'ball', '排球': 'ball', '高尔夫': 'ball', '保龄球': 'ball',
+            '台球': 'ball', '壁球': 'ball', '门球': 'ball',
+            '拳击': 'combat', '跆拳道': 'combat', '武术': 'combat', '柔术': 'combat',
+            '击剑': 'combat', '摔跤': 'combat',
+            '滑板': 'extreme', '冲浪': 'extreme', '滑雪': 'extreme', '攀岩': 'extreme',
+            '蹦极': 'extreme', '滑翔伞': 'extreme', 'BMX': 'extreme', '跑酷': 'extreme',
+            '单板滑雪': 'extreme', '雪地摩托': 'extreme', '雪橇': 'extreme',
+            '登山': 'outdoor', '徒步': 'outdoor', '露营': 'outdoor', '钓鱼': 'outdoor',
+            '骑马': 'outdoor', '射箭': 'outdoor', '定向越野': 'outdoor',
+            '瑜伽': 'leisure', '普拉提': 'leisure', '舞蹈': 'leisure', '太极': 'leisure',
+            '飞盘': 'leisure', '冰壶': 'leisure', '拉伸': 'leisure',
+            '皮划艇': 'water', '帆船': 'water', '潜水': 'water', '漂流': 'water',
+            '水上摩托': 'water',
+            '滑冰': 'snow', '冰球': 'snow'
+        };
+        
+        let currentSportCategory = 'all';
+        let currentSportSearch = '';
+        
+        // 显示运动选择页面
+        function showSportSelectPage() {
+            switchPage('SportSelect');
+            renderSportSelectGrid();
+        }
+        
+        // 渲染运动选择网格
+        function renderSportSelectGrid() {
+            const grid = document.getElementById('sportSelectGrid');
+            if (!grid) return;
+            
+            let allTypes = userData.sportTypes || defaultUserData.sportTypes;
+            
+            // 按分类筛选
+            if (currentSportCategory !== 'all') {
+                allTypes = allTypes.filter(s => sportCategories[s.name] === currentSportCategory);
+            }
+            
+            // 按搜索筛选
+            if (currentSportSearch) {
+                allTypes = allTypes.filter(s => s.name.includes(currentSportSearch));
+            }
+            
+            if (allTypes.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94A3B8;">没有找到匹配的运动类型</div>';
+                return;
+            }
+            
+            grid.innerHTML = allTypes.map(s => `
+                <div class="data-item" onclick="selectSportAndRecord('${s.name}', '${s.icon}')" style="background:${sportBgColors[s.name] || '#F8FAFC'};cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="icon" style="font-size:28px;">${s.icon}</div>
+                    <div class="label" style="font-size:13px;font-weight:500;">${s.name}</div>
+                </div>
+            `).join('');
+        }
+        
+        // 筛选运动分类
+        function filterSportCategory(cat) {
+            currentSportCategory = cat;
+            
+            // 更新按钮样式
+            document.querySelectorAll('#sportCategoryTabs .sport-cat-btn').forEach(btn => {
+                btn.style.background = '#E2E8F0';
+                btn.style.color = '#64748B';
+            });
+            event.target.style.background = '#6366F1';
+            event.target.style.color = 'white';
+            
+            renderSportSelectGrid();
+        }
+        
+        // 搜索运动
+        function filterSports(keyword) {
+            currentSportSearch = keyword;
+            renderSportSelectGrid();
+        }
+        
+        // 选择运动并打开记录界面
+        let selectedSportName = '';
+        let selectedSportIcon = '';
+        
+        function selectSportAndRecord(name, icon) {
+            selectedSportName = name;
+            selectedSportIcon = icon;
+            showSportRecordModal(name, icon);
+        }
+        
+        // 显示运动记录弹窗
+        function showSportRecordModal(name, icon) {
+            showModal(`
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:48px;margin-bottom:8px;">${icon}</div>
+                    <h3 style="font-size:20px;font-weight:700;color:#1E293B;">记录${name}</h3>
+                </div>
+                <input type="number" class="input-field" id="sportSteps" placeholder="步数（可选）" value="0">
+                <input type="number" class="input-field" id="sportCal" placeholder="卡路里（千卡）" value="0">
+                <input type="number" class="input-field" id="sportTime" placeholder="运动时长（分钟）" value="0">
+                <input type="number" class="input-field" id="sportHeart" placeholder="心率（bpm，可选）" value="0">
+                <input type="number" class="input-field" id="sportDist" placeholder="距离（km，可选）" step="0.1" value="0">
+                <input type="text" class="input-field" id="sportNote" placeholder="备注（可选）">
+                <button class="login-btn" onclick="saveSportRecord()" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);">保存记录</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        // 保存运动记录
+        function saveSportRecord() {
+            const steps = parseInt(document.getElementById('sportSteps').value) || 0;
+            const cal = parseInt(document.getElementById('sportCal').value) || 0;
+            const time = parseInt(document.getElementById('sportTime').value) || 0;
+            const heart = parseInt(document.getElementById('sportHeart').value) || 0;
+            const dist = parseFloat(document.getElementById('sportDist').value) || 0;
+            const note = document.getElementById('sportNote').value || '';
+            
+            // 更新今日数据
+            userData.todayFitness.steps += steps;
+            userData.todayFitness.calories += cal;
+            userData.todayFitness.exerciseTime += time;
+            if (heart > 0) userData.todayFitness.heartRate = heart;
+            userData.todayFitness.distance += dist;
+            
+            // 保存到历史记录
+            if (!userData.workoutHistory) userData.workoutHistory = [];
+            userData.workoutHistory.push({
+                sport: selectedSportName,
+                icon: selectedSportIcon,
+                steps, calories: cal, time, heartRate: heart, distance: dist,
+                note,
+                date: new Date().toISOString()
+            });
+            
+            saveUserData();
+            updateAllDisplays();
+            closeModal();
+            Toast('✓ ' + selectedSportName + ' 记录已保存');
+            
+            // 返回首页
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('pageHome').classList.add('active');
+            }, 800);
+        }
+        
+        // 添加自定义运动弹窗
+        function showAddCustomSportModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">添加自定义运动</h3>
+                <input type="text" class="input-field" id="customSportName" placeholder="运动名称（如：击剑）">
+                <div style="margin-bottom:16px;">
+                    <p style="font-size:13px;color:#64748B;margin-bottom:8px;">选择图标</p>
+                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+                        ${['🏃','🚶','🚴','🏊','🏋️','🧘','🏀','⚽','🏸','🎾','🏓','🥊','🥋','🛹','🏄','⛷️','🧗','⛰️','🥾','⛺','🎣','💃','☯️','🥏','🛶','⛵','🤿','⛸️','🏒','🎯','🎳','🎱','🏐','⛳','🏇','🏹','🪂','🛷','🤼','💪','🦵','🪢','🎵','🛹','🚣','🏄','🧘','🥌'].map((icon, i) => `
+                            <div class="avatar-option" onclick="selectCustomSportIcon('${icon}')" id="customSportIcon_${i}" style="width:40px;height:40px;font-size:20px;">${icon}</div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <p style="font-size:13px;color:#64748B;margin-bottom:8px;">选择分类</p>
+                    <select id="customSportCategory" class="input-field" style="padding:10px;">
+                        <option value="aerobic">有氧运动</option>
+                        <option value="strength">力量训练</option>
+                        <option value="ball">球类运动</option>
+                        <option value="combat">格斗运动</option>
+                        <option value="extreme">极限运动</option>
+                        <option value="outdoor">户外运动</option>
+                        <option value="leisure">休闲运动</option>
+                        <option value="water">水上运动</option>
+                        <option value="snow">冰雪运动</option>
+                    </select>
+                </div>
+                <button class="login-btn" onclick="addCustomSport()">添加</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        let tempCustomSportIcon = '🏃';
+        
+        function selectCustomSportIcon(icon) {
+            tempCustomSportIcon = icon;
+            document.querySelectorAll('[id^="customSportIcon_"]').forEach(el => {
+                el.style.background = '#F1F5F9';
+                el.style.borderColor = 'transparent';
+            });
+            event.target.style.background = '#EEF2FF';
+            event.target.style.borderColor = '#6366F1';
+        }
+        
+        function addCustomSport() {
+            const name = document.getElementById('customSportName').value.trim();
+            const category = document.getElementById('customSportCategory').value;
+            
+            if (!name) {
+                Toast('请输入运动名称');
+                return;
+            }
+            
+            if (userData.sportTypes.some(s => s.name === name)) {
+                Toast('该运动类型已存在');
+                return;
+            }
+            
+            userData.sportTypes.push({ name, icon: tempCustomSportIcon, custom: true, category });
+            sportCategories[name] = category;
+            saveUserData();
+            closeModal();
+            Toast('已添加 ' + tempCustomSportIcon + ' ' + name);
+            renderSportSelectGrid();
+        }
+        
+        // 完整的运动类型列表（用于首页展开）
+        const ALL_SPORTS_LIST = [
+            { name: '快走', icon: '🚶', bg: '#F0FDF4' },
+            { name: '骑行', icon: '🚴', bg: '#FFF7ED' },
+            { name: '跳绳', icon: '🪢', bg: '#FEF3C7' },
+            { name: 'HIIT', icon: '💪', bg: '#ECFDF5' },
+            { name: '有氧操', icon: '🎵', bg: '#EEF2FF' },
+            { name: '跑步机', icon: '🏃', bg: '#F3E8FF' },
+            { name: '动感单车', icon: '🚴', bg: '#FEF2F2' },
+            { name: '举重', icon: '🏋️', bg: '#FEF3C7' },
+            { name: '引体向上', icon: '💪', bg: '#F3E8FF' },
+            { name: '俯卧撑', icon: '💪', bg: '#ECFDF5' },
+            { name: '深蹲', icon: '🦵', bg: '#F0FDF4' },
+            { name: '篮球', icon: '🏀', bg: '#DBEAFE' },
+            { name: '足球', icon: '⚽', bg: '#F0FDF4' },
+            { name: '羽毛球', icon: '🏸', bg: '#EEF2FF' },
+            { name: '网球', icon: '🎾', bg: '#FCE7F3' },
+            { name: '乒乓球', icon: '🏓', bg: '#FEF3C7' },
+            { name: '排球', icon: '🏐', bg: '#DBEAFE' },
+            { name: '拳击', icon: '🥊', bg: '#FEF2F2' },
+            { name: '跆拳道', icon: '🥋', bg: '#EEF2FF' },
+            { name: '滑板', icon: '🛹', bg: '#FCE7F3' },
+            { name: '冲浪', icon: '🏄', bg: '#E0F2FE' },
+            { name: '滑雪', icon: '⛷️', bg: '#DBEAFE' },
+            { name: '攀岩', icon: '🧗', bg: '#FEF2F2' },
+            { name: '登山', icon: '⛰️', bg: '#F0FDF4' },
+            { name: '徒步', icon: '🥾', bg: '#EEF2FF' },
+            { name: '露营', icon: '⛺', bg: '#FEF3C7' },
+            { name: '瑜伽', icon: '🧘', bg: '#FCE7F3' },
+            { name: '普拉提', icon: '🧘', bg: '#FCE7F3' },
+            { name: '舞蹈', icon: '💃', bg: '#FCE7F3' },
+            { name: '太极', icon: '☯️', bg: '#F0FDF4' },
+            { name: '皮划艇', icon: '🛶', bg: '#E0F2FE' },
+            { name: '帆船', icon: '⛵', bg: '#EEF2FF' },
+            { name: '潜水', icon: '🤿', bg: '#DBEAFE' },
+            { name: '滑冰', icon: '⛸️', bg: '#EEF2FF' }
+        ];
+
+        // 渲染首页更多运动类型
+        let homeSportExpanded = false;
+        
+        // 切换首页运动类型展开/收起
+        function toggleHomeSportExpand() {
+            const expandGrid = document.getElementById('homeSportExpand');
+            const btn = document.getElementById('homeMoreSportBtn');
+            if (!expandGrid || !btn) {
+                console.log('无法找到展开网格或按钮元素');
+                return;
+            }
+            
+            if (!homeSportExpanded) {
+                // 展开 - 显示更多运动
+                const moreTypes = ALL_SPORTS_LIST;
+                
+                if (moreTypes.length > 0) {
+                    expandGrid.innerHTML = moreTypes.map(s => `
+                        <div class="data-item" onclick="goToSportPage('${s.name}','${s.icon}')" style="background:${s.bg};cursor:pointer;animation:fadeIn 0.3s;">
+                            <div class="icon">${s.icon}</div>
+                            <div class="label">${s.name}</div>
+                        </div>
+                    `).join('');
+                }
+                
+                expandGrid.style.display = 'grid';
+                btn.innerHTML = '收起 <i class="fas fa-chevron-up" style="font-size:12px;"></i>';
+                btn.style.background = '#EEF2FF';
+                btn.style.borderRadius = '8px';
+                homeSportExpanded = true;
+            } else {
+                // 收起
+                expandGrid.style.display = 'none';
+                btn.innerHTML = '更多运动 <i class="fas fa-chevron-down" style="font-size:12px;"></i>';
+                btn.style.background = 'none';
+                btn.style.borderRadius = '0';
+                homeSportExpanded = false;
+            }
+        }
+        
+        // 跳转到运动专属页面
+        function goToSportPage(name, icon) {
+            selectedSportName = name;
+            selectedSportIcon = icon;
+            switchPage('SportDetail');
+            renderSportDetailPage();
+        }
+        
+        // 渲染运动详情页面
+        function renderSportDetailPage() {
+            const page = document.getElementById('pageSportDetail');
+            if (!page) return;
+            
+            // 获取该运动的历史记录
+            const history = (userData.workoutHistory || []).filter(w => w.sport === selectedSportName);
+            const totalCount = history.length;
+            const totalCal = history.reduce((s, w) => s + (w.calories || 0), 0);
+            const totalTime = history.reduce((s, w) => s + (w.time || 0), 0);
+            
+            // 更新页面标题
+            document.getElementById('sportPageTitle').textContent = selectedSportName + '详情';
+            
+            // 更新运动头部信息
+            document.getElementById('sportDetailIcon').textContent = selectedSportIcon;
+            document.getElementById('sportDetailName').textContent = selectedSportName;
+            document.getElementById('sportDetailSummary').textContent = `累计运动 ${totalCount} 次 · ${totalTime} 分钟 · ${totalCal} 千卡`;
+            document.getElementById('sportTotalCount').textContent = totalCount;
+            document.getElementById('sportTotalTime').textContent = totalTime;
+            document.getElementById('sportTotalCal').textContent = totalCal;
+            
+            // 计算本周数据
+            const today = new Date();
+            const dayOfWeek = today.getDay() || 7;
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - dayOfWeek + 1);
+            const weekData = [0, 0, 0, 0, 0, 0, 0]; // 周一到周日
+            
+            history.forEach(h => {
+                const hDate = new Date(h.date);
+                if (hDate >= weekStart && hDate <= today) {
+                    const hDayOfWeek = hDate.getDay() || 7;
+                    weekData[hDayOfWeek - 1] += (h.calories || 0);
+                }
+            });
+            
+            // 渲染本周趋势图表
+            const maxVal = Math.max(...weekData, 1);
+            const chartContainer = document.getElementById('sportWeeklyChart');
+            chartContainer.innerHTML = weekData.map((val, i) => {
+                const height = Math.max((val / maxVal) * 80, 4);
+                const isToday = i === dayOfWeek - 1;
+                return `
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+                        <div style="font-size:10px;color:#64748B;margin-bottom:4px;">${val > 0 ? val : ''}</div>
+                        <div style="width:20px;height:${height}px;background:${isToday ? '#6366F1' : '#CBD5E1'};border-radius:4px 4px 0 0;transition:height 0.3s;"></div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 计算个人最佳
+            const bestCal = history.length > 0 ? Math.max(...history.map(h => h.calories || 0)) : 0;
+            const bestTime = history.length > 0 ? Math.max(...history.map(h => h.time || 0)) : 0;
+            document.getElementById('sportBestCal').textContent = bestCal;
+            document.getElementById('sportBestTime').textContent = bestTime + '分钟';
+            
+            // 更新成就徽章
+            const badgeFirst = document.getElementById('badge-first');
+            const badge10 = document.getElementById('badge-10');
+            const badge100cal = document.getElementById('badge-100cal');
+            const badgeMaster = document.getElementById('badge-master');
+            
+            if (totalCount >= 1) badgeFirst.style.opacity = '1';
+            if (totalCount >= 10) badge10.style.opacity = '1';
+            if (totalCal >= 100) badge100cal.style.opacity = '1';
+            if (totalCount >= 50 && totalCal >= 1000) badgeMaster.style.opacity = '1';
+            
+            // 渲染历史记录
+            const historyList = document.getElementById('sportHistoryList');
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#94A3B8;background:white;border-radius:16px;">
+                        <div style="font-size:48px;margin-bottom:12px;">📝</div>
+                        <p>暂无记录</p>
+                        <p style="font-size:12px;margin-top:4px;">点击上方"记录本次运动"开始吧</p>
+                    </div>
+                `;
+            } else {
+                historyList.innerHTML = history.slice().reverse().map(h => `
+                    <div style="background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <span style="font-size:24px;">${selectedSportIcon}</span>
+                                <div>
+                                    <div style="font-weight:600;color:#1E293B;">${new Date(h.date).toLocaleDateString()}</div>
+                                    <div style="font-size:11px;color:#94A3B8;">${new Date(h.date).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}</div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;color:#6366F1;font-size:18px;">${h.calories || 0}</div>
+                                <div style="font-size:11px;color:#94A3B8;">千卡</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:16px;padding-top:12px;border-top:1px solid #F1F5F9;">
+                            ${h.time ? `
+                                <div style="flex:1;text-align:center;">
+                                    <div style="font-size:16px;">⏱️</div>
+                                    <div style="font-weight:600;color:#1E293B;">${h.time}</div>
+                                    <div style="font-size:10px;color:#94A3B8;">分钟</div>
+                                </div>
+                            ` : ''}
+                            ${h.steps ? `
+                                <div style="flex:1;text-align:center;">
+                                    <div style="font-size:16px;">👟</div>
+                                    <div style="font-weight:600;color:#1E293B;">${h.steps}</div>
+                                    <div style="font-size:10px;color:#94A3B8;">步数</div>
+                                </div>
+                            ` : ''}
+                            ${h.distance ? `
+                                <div style="flex:1;text-align:center;">
+                                    <div style="font-size:16px;">📍</div>
+                                    <div style="font-weight:600;color:#1E293B;">${h.distance}</div>
+                                    <div style="font-size:10px;color:#94A3B8;">公里</div>
+                                </div>
+                            ` : ''}
+                            ${h.heartRate ? `
+                                <div style="flex:1;text-align:center;">
+                                    <div style="font-size:16px;">❤️</div>
+                                    <div style="font-weight:600;color:#1E293B;">${h.heartRate}</div>
+                                    <div style="font-size:10px;color:#94A3B8;">bpm</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ${h.note ? `<div style="margin-top:10px;padding:8px;background:#F8FAFC;border-radius:8px;font-size:12px;color:#64748B;"><i class="fas fa-sticky-note" style="margin-right:4px;"></i>${h.note}</div>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function renderHomeSportTypes() {
+            // 首页现在使用固定6个+添加按钮+更多运动展开，不需要动态渲染主网格
+        }
+        
+        function startWorkoutByName(name) {
+            Toast('开始记录: ' + name);
+            showWorkoutModal();
+        }
+        
+        let tempAvatar = null;
+        
+        function showEditProfileModal() {
+            const isImg = userData.profile.avatar?.startsWith('data:image');
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">编辑资料</h3>
+                <div class="text-center mb-4">
+                    <div class="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-4xl overflow-hidden" id="previewAvatar">
+                        ${isImg ? `<img src="${userData.profile.avatar}" class="w-full h-full object-cover">` : userData.profile.avatar}
+                    </div>
+                </div>
+                <div class="avatar-grid">
+                    <div class="avatar-option" onclick="selectAvatar('🚴')">🚴</div>
+                    <div class="avatar-option" onclick="selectAvatar('🏃')">🏃</div>
+                    <div class="avatar-option" onclick="selectAvatar('🏋️')">🏋️</div>
+                    <div class="avatar-option" onclick="selectAvatar('🧘')">🧘</div>
+                    <div class="avatar-option" onclick="selectAvatar('⛹️')">⛹️</div>
+                    <div class="avatar-option" onclick="selectAvatar('🤸')">🤸</div>
+                    <div class="avatar-option" onclick="selectAvatar('🏊')">🏊</div>
+                    <div class="avatar-option" onclick="selectAvatar('🎯')">🎯</div>
+                </div>
+                <input type="file" id="avatarFile" accept="image/*" class="hidden" onchange="handleAvatarFile(this)">
+                <button onclick="document.getElementById('avatarFile').click()" class="btn" style="background:#EEF2FF;color:var(--primary);margin-bottom:12px;width:100%;">
+                    <i class="fas fa-image"></i> 从相册选择
+                </button>
+                <input type="text" class="input-field" id="editNickname" placeholder="昵称" value="${userData.profile.nickname}">
+                <input type="text" class="input-field" id="editSignature" placeholder="个性签名" value="${userData.profile.signature}">
+                <button class="login-btn" onclick="saveProfile()">保存</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+        }
+        
+        function selectAvatar(emoji) {
+            tempAvatar = emoji;
+            document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.getElementById('previewAvatar').innerHTML = emoji;
+        }
+        
+        function handleAvatarFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                tempAvatar = e.target.result;
+                document.getElementById('previewAvatar').innerHTML = `<img src="${tempAvatar}" class="w-full h-full object-cover">`;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function saveProfile() {
+            userData.profile.nickname = document.getElementById('editNickname').value || '运动达人';
+            userData.profile.signature = document.getElementById('editSignature').value || '每天运动';
+            if (tempAvatar) userData.profile.avatar = tempAvatar;
+            saveUserData();
+            updateProfileDisplay();
+            tempAvatar = null;
+            closeModal();
+            Toast('资料已保存 ✓');
+        }
+        
+        let goalsSaveTimer = null;
+        function saveGoals() {
+            const steps = parseInt(document.getElementById('goalSteps').value) || 10000;
+            const cal = parseInt(document.getElementById('goalCal').value) || 500;
+            const rides = parseInt(document.getElementById('goalRides').value) || 100;
+            
+            if (goalsSaveTimer) clearTimeout(goalsSaveTimer);
+            goalsSaveTimer = setTimeout(() => {
+                userData.goals.steps = steps;
+                userData.goals.calories = cal;
+                userData.goals.weeklyRides = rides;
+                saveUserData();
+                updateFitnessDisplay();
+                updateCyclingDisplay();
+                showSaveIndicator('goalSaveIndicator');
+            }, 500);
+        }
+        
+        function showBodyDataModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">身体数据</h3>
+                <input type="number" class="input-field" id="bdWeight" placeholder="体重(kg)" step="0.1" value="${userData.bodyData.weight}">
+                <input type="number" class="input-field" id="bdHeight" placeholder="身高(cm)" value="${userData.bodyData.height}">
+                <input type="number" class="input-field" id="bdFTP" placeholder="FTP功率(W)" value="${userData.bodyData.ftp}">
+                <div class="bg-gray-50 rounded-xl p-4 text-center mb-4">
+                    <div class="text-sm text-gray-500">功率体重比</div>
+                    <div class="text-2xl font-bold text-indigo-600" id="wkgPreview">${(userData.bodyData.ftp / userData.bodyData.weight).toFixed(1)} W/kg</div>
+                </div>
+                <button class="login-btn" onclick="saveBodyData()">保存</button>
+                <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">取消</button>
+            `);
+            setTimeout(() => {
+                const bdWeight = document.getElementById('bdWeight');
+                const bdFTP = document.getElementById('bdFTP');
+                const wkgPreview = document.getElementById('wkgPreview');
+                if (bdWeight && bdFTP && wkgPreview) {
+                    const calcWkg = () => {
+                        const w = parseFloat(bdWeight.value) || 70;
+                        const f = parseInt(bdFTP.value) || 220;
+                        wkgPreview.textContent = (f / w).toFixed(1) + ' W/kg';
+                    };
+                    bdWeight.addEventListener('input', calcWkg);
+                    bdFTP.addEventListener('input', calcWkg);
+                }
+            }, 100);
+        }
+        
+        function saveBodyData() {
+            userData.bodyData.weight = parseFloat(document.getElementById('bdWeight').value) || 70;
+            userData.bodyData.height = parseInt(document.getElementById('bdHeight').value) || 175;
+            userData.bodyData.ftp = parseInt(document.getElementById('bdFTP').value) || 220;
+            saveUserData();
+            updateProfileStats();
+            updateCyclingDisplay();
+            closeModal();
+            Toast('身体数据已保存');
+            showSaveIndicator('bodySaveIndicator');
+        }
+        
+        function showSettingsModal() {
+            showModal(`
+                <h3 class="text-xl font-bold text-center mb-4">设置</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                        <div><div class="font-medium">深色模式</div><div class="text-sm text-gray-500">开启深色主题</div></div>
+                        <div class="toggle ${userData.settings.darkMode ? 'active' : ''}" onclick="this.classList.toggle('active'); userData.settings.darkMode = this.classList.contains('active'); saveUserData();"></div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                        <div><div class="font-medium">语音提示</div><div class="text-sm text-gray-500">运动数据播报</div></div>
+                        <div class="toggle ${userData.settings.voiceGuide ? 'active' : ''}" onclick="this.classList.toggle('active'); userData.settings.voiceGuide = this.classList.contains('active'); saveUserData();"></div>
+                    </div>
+                    <button class="btn" style="background:#FEE2E2;color:#EF4444;margin-top:16px;width:100%;" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> 清除所有数据
+                    </button>
+                    <button class="btn" style="background:#64748B;color:white;margin-top:8px;width:100%;" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> 退出登录
+                    </button>
+                    <button class="w-full py-3 text-gray-500 mt-2" onclick="closeModal()">关闭</button>
+                </div>
+            `);
+        }
+        
+        function clearAllData() {
+            if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                localStorage.removeItem('sportplus_v2');
+                userData = JSON.parse(JSON.stringify(defaultUserData));
+                saveUserData();
+                updateAllDisplays();
+                closeModal();
+                Toast('所有数据已清除');
+            }
+        }
+        
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                userData.isLoggedIn = false;
+                saveUserData();
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('appMain').style.display = 'none';
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                closeModal();
+                Toast('已退出登录');
+            }
+        }
+        
+        function setStatsPeriod(period, type) {
+            const tabsId = type === 'fitness' ? 'fitnessPeriodTabs' : 'cyclingPeriodTabs';
+            const tabs = document.getElementById(tabsId);
+            tabs.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const periodNames = { day: '今日', week: '本周', month: '本月', year: '本年' };
+            const name = periodNames[period];
+            
+            // 更新标签
+            if (type === 'fitness') {
+                document.getElementById('statStepsLbl').textContent = name + '步数';
+                document.getElementById('statCalLbl').textContent = name + '卡路里';
+                document.getElementById('statTimeLbl').textContent = '运动时长';
+                document.getElementById('statDaysLbl').textContent = '运动天数';
+                
+                // 更新图表数据（这里使用模拟数据）
+                const chart = document.getElementById('fitnessChart');
+                const bars = chart.querySelectorAll('.chart-bar');
+                bars.forEach((bar, i) => {
+                    if (period === 'day') {
+                        bar.style.height = (Math.random() * 60 + 20) + '%';
+                    } else if (period === 'week') {
+                        bar.style.height = (Math.random() * 70 + 20) + '%';
+                    } else if (period === 'month') {
+                        bar.style.height = (Math.random() * 80 + 20) + '%';
+                    } else {
+                        bar.style.height = (Math.random() * 90 + 10) + '%';
+                    }
+                });
+            }
+        }
+        
+        // ========== 启动 ==========
+        window.onload = function() {
+            loadUserData();
+            if (userData.isLoggedIn) {
+                showAppMain();
+            }
+        };
+    </script>
+</body>
+</html>
