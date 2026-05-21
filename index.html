@@ -6,7 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>运动+ | 健身骑行全能助手</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css?v=2">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
@@ -3648,20 +3651,31 @@
             if (workoutPaused) return;
             workoutSeconds++;
             
-            // 计算步数
+            // 计算步数（基于运动类型的固定步频）
             const stepsPerSec = (SPORT_STEPS_PER_MIN[selectedSportName] || 80) / 60;
             workoutLiveSteps = Math.round(workoutSeconds * stepsPerSec);
             
-            // 计算热量
+            // 计算热量（基于运动类型的固定消耗）
             const calPerSec = (SPORT_CAL_PER_MIN[selectedSportName] || 7) / 60;
             workoutLiveCal = Math.round(workoutSeconds * calPerSec);
             
-            // 模拟距离
-            const distPerSec = 0.005 + (Math.random() * 0.003);
-            workoutLiveDist = Math.round((workoutLiveDist + distPerSec) * 10) / 10;
+            // 计算距离（基于步数和步幅，固定计算）
+            const stepLength = 0.7; // 平均步幅0.7米
+            workoutLiveDist = Math.round((workoutLiveSteps * stepLength / 1000) * 10) / 10;
             
-            // 模拟心率（120-160之间波动）
-            workoutLiveHeart = 120 + Math.floor(Math.random() * 40);
+            // 心率：基于运动类型和时长稳定变化（不是随机跳动）
+            const baseHeartRate = 75; // 静息心率
+            const maxHeartRate = 180; // 最大心率
+            const targetRate = Math.min(
+                baseHeartRate + (SPORT_CAL_PER_MIN[selectedSportName] || 7) * 6,
+                maxHeartRate
+            );
+            // 心率逐渐上升到目标值，然后稳定
+            const progress = Math.min(workoutSeconds / 120, 1); // 2分钟达到稳定
+            const currentTarget = baseHeartRate + (targetRate - baseHeartRate) * progress;
+            // 添加微小自然波动（±2）
+            const naturalVar = Math.sin(workoutSeconds * 0.3) * 2;
+            workoutLiveHeart = Math.round(currentTarget + naturalVar);
             
             updateWorkoutDisplay();
         }
