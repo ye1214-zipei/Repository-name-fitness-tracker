@@ -1801,9 +1801,17 @@
                                     
                                     <!-- 计时器 -->
                                     <div id="workoutTimer" style="font-size:56px;font-weight:800;color:white;font-family:'Courier New',monospace;letter-spacing:4px;margin-bottom:8px;">00:00:00</div>
-                                    <div class="workout-status" style="display:inline-block;background:rgba(239,68,68,0.2);color:#EF4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:16px;">
-                                        <span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;margin-right:6px;animation:blink 1s infinite;"></span>
-                                        运动进行中
+                                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:12px;">
+                                        <div class="workout-status" style="display:inline-block;background:rgba(239,68,68,0.2);color:#EF4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">
+                                            <span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;margin-right:6px;animation:blink 1s infinite;"></span>
+                                            运动进行中
+                                        </div>
+                                        <div id="sensorStatusBadge" style="display:inline-block;background:rgba(16,185,129,0.2);color:#10B981;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:500;">
+                                            📱 准备连接传感器...
+                                        </div>
+                                    </div>
+                                    <div id="sensorHint" style="display:none;color:#FCD34D;font-size:11px;margin-bottom:12px;padding:6px 12px;background:rgba(252,211,77,0.1);border-radius:10px;">
+                                        💡 拿着手机走动，步数才会增加哦~
                                     </div>
                                     
                                     <!-- 实时数据 -->
@@ -2565,6 +2573,7 @@
                     // 不足30秒直接停止不保存
                     clearInterval(workoutTimer);
                     workoutTimer = null;
+                    stopMotionSensor();
                     document.getElementById('sportWorkoutActive').style.display = 'none';
                     document.getElementById('sportActionButtons').style.display = 'flex';
                 }
@@ -2583,6 +2592,7 @@
         function stopWorkoutAndSave() {
             clearInterval(workoutTimer);
             workoutTimer = null;
+            stopMotionSensor();
             
             const minutes = Math.ceil(workoutSeconds / 60);
             const record = {
@@ -2591,9 +2601,9 @@
                 steps: workoutLiveSteps,
                 calories: workoutLiveCal,
                 time: minutes,
-                heartRate: workoutLiveHeart,
+                heartRate: 0,
                 distance: parseFloat(workoutLiveDist.toFixed(1)),
-                note: '计时运动(自动结束)',
+                note: sensorEnabled ? '传感器计步(自动结束)' : '计时运动(自动结束)',
                 date: new Date().toISOString()
             };
             
@@ -3570,33 +3580,72 @@
         let selectedSportName = '';
         let selectedSportIcon = '';
         
-        // ==================== 运动计时器系统 ====================
+        // ==================== 运动计时器系统（传感器真实计步） ====================
         let workoutTimer = null;        // 定时器ID
         let workoutSeconds = 0;         // 已运动秒数
         let workoutPaused = false;      // 是否暂停
         let workoutStartTime = null;    // 开始时间
         let workoutLiveCal = 0;         // 实时热量
-        let workoutLiveDist = 0;        // 实时距离
-        let workoutLiveHeart = 0;       // 实时心率（模拟）
-        let workoutLiveSteps = 0;       // 实时步数
+        let workoutLiveDist = 0;        // 实时距离（基于真实步数）
+        let workoutLiveHeart = 0;       // 心率（需要手环等设备才能获取，显示为--）
+        let workoutLiveSteps = 0;       // 真实步数（传感器检测）
+        let workoutLastStepTime = 0;    // 上一次检测到步数的时间
         
-        // 各运动的每分钟步数估算
-        const SPORT_STEPS_PER_MIN = {
-            '跑步': 160, '快走': 120, '骑行': 0, '跳绳': 200, 'HIIT': 130, '有氧操': 100,
-            '游泳': 0, '登山': 100, '瑜伽': 10, '普拉提': 15, '力量训练': 30, '划船': 60,
-            '拳击': 100, '跆拳道': 90, '摔跤': 80, '太极': 40, '拉伸': 5, '椭圆机': 120,
-            '爬楼梯': 150, '动感单车': 60, 'CrossFit': 100, '搏击操': 110, '街舞': 100,
-            '芭蕾': 50, '体操': 60, '滑雪': 0, '滑冰': 80, '轮滑': 80, '冲浪': 0,
-            '皮划艇': 0, '帆船': 0, '攀岩': 40, '蹦床': 100, '飞盘': 120, '武术': 70,
-            '射箭': 0, '高尔夫': 60, '壁球': 120, '保龄球': 30, '板球': 80, '橄榄球': 100,
-            '曲棍球': 90, '马术': 0, '击剑': 70, '举重': 20, '仰卧起坐': 15, '俯卧撑': 10,
-            '引体向上': 8, '深蹲': 20, '硬拉': 15, '卧推': 10, '划船机': 60, '战绳': 80,
-            '壶铃': 40, 'TRX': 50, '自重训练': 40, '健美操': 80, '尊巴': 90, '爵士舞': 70,
-            '现代舞': 60, '踢踏舞': 100, '广场舞': 80
-        };
+        // ===== 加速度传感器计步算法 =====
+        let sensorEnabled = false;       // 传感器是否已授权
+        let sensorActive = false;        // 传感器是否正在监听
+        let accelHistory = [];           // 加速度历史数据（用于平滑）
+        let lastStepTimestamp = 0;       // 上一步的时间戳
+        let accelMagnitudePrev = 0;      // 上一次加速度幅值
+        let stepThreshold = 1.15;        // 步数检测阈值（重力加速度倍数）
+        let stepCooldown = 280;          // 步数冷却时间（毫秒），防止重复计数
         
-        // 各运动的每分钟热量消耗估算（千卡/分钟）
-        const SPORT_CAL_PER_MIN = {
+        // 步数检测回调
+        function handleMotion(event) {
+            if (!sensorActive || workoutPaused) return;
+            
+            const acc = event.accelerationIncludingGravity;
+            if (!acc || acc.x === null) return;
+            
+            // 计算加速度幅值（去除重力后的合成加速度）
+            const magnitude = Math.sqrt(
+                acc.x * acc.x + acc.y * acc.y + acc.z * acc.z
+            );
+            
+            // 平滑滤波
+            accelHistory.push(magnitude);
+            if (accelHistory.length > 5) accelHistory.shift();
+            const smoothed = accelHistory.reduce((a, b) => a + b, 0) / accelHistory.length;
+            
+            // 检测波峰（步数特征：加速度先上升后下降）
+            const now = Date.now();
+            if (smoothed > stepThreshold && accelMagnitudePrev <= stepThreshold) {
+                // 冷却时间，防止同一动作重复计数
+                if (now - lastStepTimestamp > stepCooldown) {
+                    lastStepTimestamp = now;
+                    workoutLiveSteps++;
+                    workoutLastStepTime = now;
+                    
+                    // 基于真实步数反算数据
+                    updateWorkoutFromSteps();
+                }
+            }
+            accelMagnitudePrev = smoothed;
+        }
+        
+        // 根据真实步数更新距离和热量
+        function updateWorkoutFromSteps() {
+            // 距离：真实步数 × 平均步幅
+            const stepLength = 0.7; // 米
+            workoutLiveDist = Math.round((workoutLiveSteps * stepLength / 1000) * 100) / 100;
+            
+            // 热量：基于时间和运动类型的固定消耗（有运动基础消耗）
+            const calPerSec = (SPORT_CAL_PER_MIN_V2[selectedSportName] || 7) / 60;
+            workoutLiveCal = Math.round(workoutSeconds * calPerSec);
+        }
+        
+        // 各运动的每分钟热量消耗（千卡/分钟）—— 用于基础代谢计算
+        const SPORT_CAL_PER_MIN_V2 = {
             '跑步': 10, '快走': 5, '骑行': 8, '跳绳': 11, 'HIIT': 12, '有氧操': 7,
             '游泳': 9, '登山': 8, '瑜伽': 4, '普拉提': 4, '力量训练': 7, '划船': 9,
             '拳击': 10, '跆拳道': 9, '摔跤': 10, '太极': 3, '拉伸': 2, '椭圆机': 7,
@@ -3610,10 +3659,77 @@
             '现代舞': 6, '踢踏舞': 7, '广场舞': 5
         };
         
+        // 启动传感器监听
+        function startMotionSensor() {
+            // iOS 13+ 需要请求权限
+            if (typeof DeviceMotionEvent !== 'undefined') {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // iOS 需要用户点击授权
+                    DeviceMotionEvent.requestPermission()
+                        .then(state => {
+                            if (state === 'granted') {
+                                enableMotionListener();
+                            } else {
+                                sensorNotAvailable('需要授权才能使用传感器计步');
+                            }
+                        })
+                        .catch(() => {
+                            sensorNotAvailable('传感器授权失败，将使用手动记录模式');
+                        });
+                } else {
+                    // Android 或其他设备直接启用
+                    enableMotionListener();
+                }
+            } else {
+                sensorNotAvailable('您的设备不支持运动传感器');
+            }
+        }
+        
+        function enableMotionListener() {
+            sensorEnabled = true;
+            sensorActive = true;
+            accelHistory = [];
+            accelMagnitudePrev = 0;
+            lastStepTimestamp = 0;
+            window.addEventListener('deviceorientation', handleMotion, { passive: true }); // 备用
+            window.addEventListener('devicemotion', handleMotion, { passive: true });
+            updateSensorStatus('sensor-active');
+        }
+        
+        function stopMotionSensor() {
+            sensorActive = false;
+            window.removeEventListener('devicemotion', handleMotion);
+            window.removeEventListener('deviceorientation', handleMotion);
+            accelHistory = [];
+        }
+        
+        function sensorNotAvailable(msg) {
+            sensorEnabled = false;
+            sensorActive = false;
+            updateSensorStatus('sensor-unavailable');
+            Toast('⚠️ ' + msg);
+        }
+        
+        // 更新传感器状态显示
+        function updateSensorStatus(status) {
+            const el = document.getElementById('sensorStatusBadge');
+            if (!el) return;
+            if (status === 'sensor-active') {
+                el.innerHTML = '<span style="display:inline-block;width:6px;height:6px;background:#10B981;border-radius:50%;margin-right:6px;animation:blink 1s infinite;"></span>传感器计步中';
+                el.style.background = 'rgba(16,185,129,0.2)';
+                el.style.color = '#10B981';
+            } else if (status === 'sensor-unavailable') {
+                el.innerHTML = '⚠️ 传感器不可用';
+                el.style.background = 'rgba(245,158,11,0.2)';
+                el.style.color = '#F59E0B';
+            }
+        }
+        
         // 开始运动
         function startSportWorkout() {
             // 先清理之前的计时器
             if (workoutTimer) { clearInterval(workoutTimer); workoutTimer = null; }
+            stopMotionSensor();
             
             const sportDiv = document.getElementById('sportWorkoutActive');
             const actionDiv = document.getElementById('sportActionButtons');
@@ -3625,6 +3741,7 @@
             workoutLiveDist = 0;
             workoutLiveHeart = 0;
             workoutLiveSteps = 0;
+            workoutLastStepTime = 0;
             workoutStartTime = Date.now();
             
             // 显示运动界面
@@ -3637,45 +3754,33 @@
             document.getElementById('pauseIcon').className = 'fas fa-pause';
             
             updateWorkoutDisplay();
-            Toast('🏃 开始' + selectedSportName + '！加油！');
             
-            // 启动计时器
+            // 启动加速度传感器计步
+            startMotionSensor();
+            
+            // 启动计时器（只计时，不自动加步数）
             workoutTimer = setInterval(workoutTick, 1000);
             
             // 滚动到运动界面
             sportDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            Toast('🏃 开始' + selectedSportName + '！拿着手机走起来吧！');
         }
         
-        // 每秒触发
+        // 每秒触发（仅计时 + 更新热量，步数由传感器驱动）
         function workoutTick() {
             if (workoutPaused) return;
             workoutSeconds++;
             
-            // 计算步数（基于运动类型的固定步频）
-            const stepsPerSec = (SPORT_STEPS_PER_MIN[selectedSportName] || 80) / 60;
-            workoutLiveSteps = Math.round(workoutSeconds * stepsPerSec);
-            
-            // 计算热量（基于运动类型的固定消耗）
-            const calPerSec = (SPORT_CAL_PER_MIN[selectedSportName] || 7) / 60;
+            // 热量：基于运动时间和类型的固定消耗
+            const calPerSec = (SPORT_CAL_PER_MIN_V2[selectedSportName] || 7) / 60;
             workoutLiveCal = Math.round(workoutSeconds * calPerSec);
             
-            // 计算距离（基于步数和步幅，固定计算）
-            const stepLength = 0.7; // 平均步幅0.7米
-            workoutLiveDist = Math.round((workoutLiveSteps * stepLength / 1000) * 10) / 10;
-            
-            // 心率：基于运动类型和时长稳定变化（不是随机跳动）
-            const baseHeartRate = 75; // 静息心率
-            const maxHeartRate = 180; // 最大心率
-            const targetRate = Math.min(
-                baseHeartRate + (SPORT_CAL_PER_MIN[selectedSportName] || 7) * 6,
-                maxHeartRate
-            );
-            // 心率逐渐上升到目标值，然后稳定
-            const progress = Math.min(workoutSeconds / 120, 1); // 2分钟达到稳定
-            const currentTarget = baseHeartRate + (targetRate - baseHeartRate) * progress;
-            // 添加微小自然波动（±2）
-            const naturalVar = Math.sin(workoutSeconds * 0.3) * 2;
-            workoutLiveHeart = Math.round(currentTarget + naturalVar);
+            // 如果长时间没有检测到步数，提示用户
+            if (workoutLiveSteps === 0 && workoutSeconds >= 15) {
+                const hintEl = document.getElementById('sensorHint');
+                if (hintEl) hintEl.style.display = 'block';
+            }
             
             updateWorkoutDisplay();
         }
@@ -3722,12 +3827,16 @@
             if (workoutSeconds < 10) {
                 if (!confirm('运动时间不到10秒，确定要结束吗？')) return;
             } else {
-                if (!confirm(`运动了 ${formatWorkoutTime(workoutSeconds)}，${workoutLiveSteps} 步，消耗 ${workoutLiveCal} 千卡。确定结束吗？`)) return;
+                const stepText = sensorEnabled 
+                    ? `${workoutLiveSteps} 步（传感器检测）`
+                    : `${workoutLiveSteps} 步`;
+                if (!confirm(`运动了 ${formatWorkoutTime(workoutSeconds)}，${stepText}，消耗 ${workoutLiveCal} 千卡。确定结束吗？`)) return;
             }
             
-            // 停止计时器
+            // 停止计时器和传感器
             clearInterval(workoutTimer);
             workoutTimer = null;
+            stopMotionSensor();
             
             // 保存记录
             const minutes = Math.ceil(workoutSeconds / 60);
@@ -3737,9 +3846,9 @@
                 steps: workoutLiveSteps,
                 calories: workoutLiveCal,
                 time: minutes,
-                heartRate: workoutLiveHeart,
+                heartRate: 0,
                 distance: parseFloat(workoutLiveDist.toFixed(1)),
-                note: '计时运动',
+                note: sensorEnabled ? '传感器实时计步' : '计时运动',
                 date: new Date().toISOString()
             };
             
